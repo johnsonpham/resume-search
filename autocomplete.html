@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Job search autocomplete</title>
+  <link rel="stylesheet" href="search.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+</head>
+
+<body>
+  <div id="live-demo">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-8 col-sm-offset-2">
+          <div>
+            <div class="search_box-wrapper">
+              <div class="search_box">
+                <form action="#" id="search-form" method="get" onsubmit="return false;">
+                  <input autocomplete="off" class="autocomplete" id="inputfield" name="address" placeholder="Search jobs autocomplete..." spellcheck="false" type="text">
+                  <div class="search-button">
+                    <i class="fa fa-search"></i>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div class="queries"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="//cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+  <script type="text/javascript">
+    var client = algoliasearch('JF8Q26WWUD', '542af25db3bf09980458a9675e27517b');
+    var idx = client.initIndex('techworks');
+
+    function searchCallback(err, content) {
+      if (content.query != $("#inputfield").val())
+        return;
+      if (content.hits.length == 0) {
+        $('.queries').hide();
+        return;
+      }
+      res = '';
+      for (var i = 0; i < content.hits.length; ++i) {
+        var companyLogo = content.hits[i].companyLogo || 'http://www.php.company/img/placeholder-logo.png';
+        res += '<div class="query">';
+        res += '<div class="query-right">' + content.hits[i]._highlightResult.jobTitle.value;
+        res += '</div>';
+        res += '</div>';
+      }
+      $('.queries').html(res);
+      $('.queries').show();
+    }
+
+    function search(query) {
+      if (query.length === 0) {
+        $('.queries').hide();
+        return;
+      }
+
+      idx.search(query, {
+        hitsPerPage: 5,
+        getRankingInfo: 1
+      }, searchCallback);
+    }
+
+    $(document).ready(function() {
+          var inputfield = $('#inputfield');
+
+          inputfield.keyup(function() {
+            search(inputfield.val());
+          });
+        });
+  </script>
+</body>
+
+</html>
