@@ -82,17 +82,14 @@ function extractAttached($conn, &$item) {
 function extractTotal($conn, &$item) {
   $resumeid = $item["resumeid"];
   $sql = "SELECT SUM(views) totalViews, SUM(downloads) totalDownloads
-          FROM (SELECT resumeid resumeId, 0 AS views, 1 AS downloads
-                FROM tblresume_download_tracking
-                 WHERE resumeid = $resumeid UNION ALL
-                     SELECT resume_id resumeId, 0 AS views, 1 AS downloads
-                     FROM track_resume_download
-                     WHERE resume_id = $resumeid
-                     UNION ALL
-                     SELECT resume_id resumeId, noofviewed AS views,0 AS downloads
-                     FROM track_resume_view
-                     WHERE resume_id = $resumeid) f
-                     GROUP BY resumeId";
+          FROM (
+            SELECT resumeid resumeId, 0 AS views, 1 AS downloads FROM tblresume_download_tracking WHERE resumeid = $resumeid 
+            UNION ALL
+            SELECT resume_id resumeId, 0 AS views, 1 AS downloads FROM track_resume_download WHERE resume_id = $resumeid
+            UNION ALL
+            SELECT resume_id resumeId, noofviewed AS views,0 AS downloads FROM track_resume_view WHERE resume_id = $resumeid
+          ) f
+          GROUP BY resumeId";
   $result = $conn->query($sql);
   $item["total_views"] = 0;
   $item["total_downloads"] = 0;
