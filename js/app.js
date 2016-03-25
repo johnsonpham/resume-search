@@ -11,13 +11,13 @@ $(document).ready(function() {
   var INDEX_NAME = 'resumes';
   var PARAMS = {
     hitsPerPage: 20,
-    maxValuesPerFacet: 10,
+    maxValuesPerFacet: 5,
     facets: ['type'],
-    disjunctiveFacets: ['category_en', 'job_level_en', 'location_en']
+    disjunctiveFacets: ['category_en', 'location_en', 'job_level_en', 'most_recent_employer']
   };
-  var FACETS_SLIDER = ['price'];
-  var FACETS_ORDER_OF_DISPLAY = ['location_en', 'job_level_en', 'category_en'];
-  var FACETS_LABELS = {'location_en': 'Location', category_en: 'Category', job_level_en: 'Job level'};
+  var FACETS_SLIDER = ['updated_date'];
+  var FACETS_ORDER_OF_DISPLAY = ['category_en', 'location_en', 'job_level_en', 'most_recent_employer'];
+  var FACETS_LABELS = {category_en: 'Category', 'location_en': 'Location', job_level_en: 'Job Level', most_recent_employer:'Most recent employer'};
 
   // Client + Helper initialization
   var algolia = algoliasearch(APPLICATION_ID, SEARCH_ONLY_API_KEY);

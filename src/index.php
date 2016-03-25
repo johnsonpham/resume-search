@@ -1,4 +1,6 @@
 <?php
+//var_dump(strtotime('2015-02-19'));die;
+
 require __DIR__ . '/../vendor/autoload.php';
 
 $servername = "";
@@ -12,9 +14,6 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
-
-$page = 1;
-$count = 1000;
 
 function extractLocation($conn, &$item)
 {
@@ -99,10 +98,41 @@ function extractTotal($conn, &$item) {
   }
 }
 
+function extractCompletionRate($conn, &$item) {
+  $resumeid = $item["resumeid"];
+  $sql = "SELECT completionRate FROM tblresume_extra_info WHERE resumeId = $resumeid";
+  $result = $conn->query($sql);
+  $item["completion_rate"] = 0;
+  while ($row = $result->fetch_assoc()) {
+    $item["completion_rate"] = (int) + $row["completionRate"];
+  }
+}
+
+function extractYearExperienceResume($conn, &$item) {
+  $yearid = $item["yearsexperienceid"];
+  $sql = "Select languageid, yearsexperiencename From tblref_yearsexperience_resume Where yearsexperienceid = $yearid";
+  $result = $conn->query($sql);
+  while ($row = $result->fetch_assoc()) {
+    if ($row['languageid'] == 1) {
+      $item["exp_years_vi"] = $row['yearsexperiencename'];
+    }
+    else {
+      $item["exp_years_en"] = $row['yearsexperiencename'];
+    }
+  }
+  unset($item['yearsexperienceid']);
+}
+
+$page = 1;
+$count = 1000;
+$totalPage = 4;
 while (true) {
   $offset = ($page - 1) * $count;
-  $sql = "Select resumeid, fullname, category, content, desiredjobtitle, desiredjoblevelid, education, skill, resumetitle, exp_description, 
-    edu_major, lastdateupdated, joblevel, mostrecentemployer, suggestedsalary, exp_jobtitle, mostrecentposition
+  $sql = "Select resumeid, fullname, category, content, desiredjobtitle as desired_job_title, desiredjoblevelid, 
+    education, skill, resumetitle as resume_title, exp_description, 
+    edu_major, lastdateupdated as updated_date, joblevel, mostrecentemployer as most_recent_employer, 
+    suggestedsalary as suggested_salary, exp_jobtitle, mostrecentposition as most_recent_position, 
+    yearsexperienceid
     From tblresume_search_all limit $offset, $count";
   $result = $conn->query($sql);
 
@@ -111,7 +141,9 @@ while (true) {
 
     while ($row = $result->fetch_assoc()) {
       $item = $row;
-      $item["suggestedsalary"] = (int) + $item["suggestedsalary"];
+      $item["suggested_salary"] = (int) + $item["suggested_salary"];
+      $item["updated_date"] = strtotime($item["updated_date"]);
+//      date("Y-d-m", strtotime('2015-02-19'))
 
       extractLocation($conn, $item);
 
@@ -126,6 +158,10 @@ while (true) {
       extractAttached($conn, $item);
 
       extractTotal($conn, $item);
+
+      extractCompletionRate($conn, $item);
+
+      extractYearExperienceResume($conn, $item);
 
       $data[] = $item;
     }
@@ -146,6 +182,7 @@ while (true) {
     echo ($page * $count) . " records has been saved" . PHP_EOL;
   }
   else {
+    var_dump($result);
     echo "0 results";
     break;
   }
@@ -153,7 +190,7 @@ while (true) {
 //  var_dump($data);die;
 
   $page++;
-  if ($page > 4) {
+  if ($page > $totalPage) {
     break;
   }
 }

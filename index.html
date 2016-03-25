@@ -45,12 +45,19 @@
         <img src="{{{ companyLogo }}}" alt="{{ name }}">
       </div>
       <div class="hit-content">
-        <h4 class="hit-name">{{{ _highlightResult.resumetitle.value }}}</h4>
-        <p class="hit-description">Fullname: {{{ _highlightResult.fullname.value }}}</p>
-        <p class="hit-description">Current Employer: {{{ _highlightResult.mostrecentemployer.value }}}</p>
-        <p class="hit-description">Location: {{{ _highlightResult.location_en.value }}}</p>
-        <p class="hit-description">Job Level: {{{ _highlightResult.job_level_en.value }}}</p>
-        <p class="hit-description">Industry: {{{ _highlightResult.category_en.value }}}</p>
+		<h4 class="hit-name">
+         <a target='_blank'  href="http://employer.staging.vietnamworks.com/v2/resume/detail/{{{objectID}}}">{{{ _highlightResult.most_recent_position.value }}}</a>
+       </h4>
+        <p class="hit-description">Fullname: {{{ fullname }}}</p>
+        <p class="hit-description">Current Employer: {{{ most_recent_employer }}}</p>
+        <p class="hit-description">Location: {{{ location_en }}}</p>
+        <p class="hit-description">Job Level: {{{ job_level_en }}}</p>
+        <p class="hit-description">Industry: {{{ category_en }}}</p>
+		<p class="hit-description">Last modified: {{{ updated_date }}}</p>
+		<p class="hit-description">Completion: {{{ completion_rate }}}</p>
+		<p class="hit-description">Views: {{{ total_views }}}</p>
+		<p class="hit-description">Downloads: {{{ total_downloads }}}</p>
+
         <!--<div class="hit-description" style="margin-bottom: 5px">-->
           <!--Locations:-->
           <!--{{#_highlightResult.locations}}-->
