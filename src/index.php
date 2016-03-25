@@ -174,7 +174,11 @@ while (true) {
       $row['objectID'] = $row['resumeid'];
       array_push($batch, $row);
       if (count($batch) == $count) {
-        $index->saveObjects($batch);
+        try {
+          $index->saveObjects($batch);
+        } catch (Exception $e) {
+          echo 'Caught exception: ',  $e->getMessage(), "\n";
+        }
         $batch = array();
       }
     }
@@ -182,12 +186,9 @@ while (true) {
     echo ($page * $count) . " records has been saved" . PHP_EOL;
   }
   else {
-    var_dump($result);
     echo "0 results";
     break;
   }
-
-//  var_dump($data);die;
 
   $page++;
   if ($page > $totalPage) {
