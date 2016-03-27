@@ -13,11 +13,14 @@ $(document).ready(function() {
     hitsPerPage: 20,
     maxValuesPerFacet: 5,
     facets: ['type'],
-    disjunctiveFacets: ['category_en', 'location_en', 'job_level_en', 'most_recent_employer']
+    disjunctiveFacets: ['category_en', 'location_en', 'job_level_en', 'most_recent_employer','updated_date','suggested_salary'
+						, 'exp_years_en', 'attached']
   };
   var FACETS_SLIDER = ['updated_date'];
-  var FACETS_ORDER_OF_DISPLAY = ['category_en', 'location_en', 'job_level_en', 'most_recent_employer'];
-  var FACETS_LABELS = {category_en: 'Category', 'location_en': 'Location', job_level_en: 'Job Level', most_recent_employer:'Most recent employer'};
+  var FACETS_ORDER_OF_DISPLAY = ['category_en', 'location_en', 'job_level_en', 'most_recent_employer','updated_date','suggested_salary','exp_years_en','attached'];
+  var FACETS_LABELS = {category_en: 'Category', 'location_en': 'Location', job_level_en: 'Job Level', most_recent_employer:'Most recent employer'
+						, updated_date:'Last modified', suggested_salary:'Suggested Salary'
+						, exp_years_en:'Years of Experience', attached:'Is Attached'};
 
   // Client + Helper initialization
   var algolia = algoliasearch(APPLICATION_ID, SEARCH_ONLY_API_KEY);
