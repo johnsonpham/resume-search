@@ -32,7 +32,7 @@ main {
 
 header {
 	position: relative;
-	height: 80px;
+	height: 120px;
 	margin-top: 40px;
 }
 header img {
@@ -49,7 +49,7 @@ header img {
 	margin-left: 26%;
 	padding: 10px 0 6px;
 	border: none;
-	border-bottom: 5px solid #eee;
+	border-bottom: 2px solid #eee;
 }
 #search-input, #search-input:focus {
 	transition: border-color .3s ease-in;
@@ -80,14 +80,22 @@ header img {
 	background-image: url(../img/delete_icon.png);
 }
 
-
+#search-options {
+	width: 74%;
+	margin-left: 26%;
+	margin-top: 5px;
+	margin-bottom: 20px;
+	padding: 10px 0 10px 0px;
+	border: none;
+	border-bottom: 5px solid #008FFF;	
+}
 
 /* HITS
 // ------------------------- */
 
 #hits {
-	margin: 4px 0;
-	padding: 10px 0;
+	margin: 0px 0;
+	padding: 4px 0;
 	border-top: 2px solid #eee;
 }
 .hit {
@@ -118,15 +126,32 @@ header img {
 	vertical-align: top;
 }
 .hit-content .hit-price {
-	font-size: 20px;
+	font-size: 10px;
 	float: right;
 	margin-left: 20px;
-	color: #ed5565;
+	color: #008000;
 }
 .hit-content .hit-price, .hit-content .hit-name {
 	font-weight: normal;
 	margin-top: 0;
 }
+
+.hit-content .hit-left {
+        font-size: 12px;
+        color: #FFA500;
+        font-weight: normal;
+        margin-top: 0;
+}
+
+.hit-content .hit-right {
+        font-size: 12px;
+        color: #FFA500;
+        float: right;
+        margin-left: 40px;
+        font-weight: normal;
+        margin-top: 0;
+}
+
 .hit-content em {
 	font-style: normal;
 	background: #fbdde0;

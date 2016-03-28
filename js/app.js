@@ -13,11 +13,15 @@ $(document).ready(function() {
     hitsPerPage: 20,
     maxValuesPerFacet: 5,
     facets: ['type'],
-    disjunctiveFacets: ['category_en', 'location_en', 'job_level_en', 'most_recent_employer']
+    disjunctiveFacets: ['category_en', 'location_en', 'job_level_en', 'most_recent_employer','updated_date','suggested_salary'
+						, 'exp_years_en', 'attached']
+	,numericFilters: 'updated_date>=1422359939'	
   };
   var FACETS_SLIDER = ['updated_date'];
-  var FACETS_ORDER_OF_DISPLAY = ['category_en', 'location_en', 'job_level_en', 'most_recent_employer'];
-  var FACETS_LABELS = {category_en: 'Category', 'location_en': 'Location', job_level_en: 'Job Level', most_recent_employer:'Most recent employer'};
+  var FACETS_ORDER_OF_DISPLAY = ['category_en', 'location_en', 'job_level_en', 'most_recent_employer','updated_date','suggested_salary','exp_years_en','attached'];
+  var FACETS_LABELS = {category_en: 'Category', 'location_en': 'Location', job_level_en: 'Job Level', most_recent_employer:'Most recent employer'
+						, updated_date:'Last modified', suggested_salary:'Suggested Salary'
+						, exp_years_en:'Years of Experience', attached:'Is Attached'};
 
   // Client + Helper initialization
   var algolia = algoliasearch(APPLICATION_ID, SEARCH_ONLY_API_KEY);
@@ -32,6 +36,8 @@ $(document).ready(function() {
   $stats = $('#stats');
   $facets = $('#facets');
   $pagination = $('#pagination');
+	// added by Ninh
+  $lastModified = $('#last-modified');
 
   // Hogan templates binding
   var hitTemplate = Hogan.compile($('#hit-template').text());
@@ -66,6 +72,7 @@ $(document).ready(function() {
 
   // Search results
   algoliaHelper.on('result', function(content, state) {
+	console.log('on result');
     renderStats(content);
     renderHits(content);
     renderFacets(content, state);
@@ -272,7 +279,28 @@ $(document).ready(function() {
     $searchInput.val('').focus();
     algoliaHelper.setQuery('').clearRefinements().search();
   });
+  // Added by Ninh
+  $lastModified.on('change', function(e){
+	console.log('lastModified on change');
+	//e.preventDefault();
 
+	//facetName = 'updated_date';	
+	lastModifiedSelectVal= parseInt($("#last-modified option:selected").val());
+	//alert($lastModifiedSelectVal);
+	if (lastModifiedSelectVal >  -1) {
+		lastModified4Search = ($.now()/1000) - (lastModifiedSelectVal*24*3600);	
+		//algoliaHelper.removeNumericFilters('updated_date', '>=');		
+		algoliaHelper.numericFilters='updated_date >= ' + lastModified4Search;
+	} else {
+		//alert('Not search by date'+PARAMS.numericFilters);
+		//algoliaHelper.removeNumericRefinement('updated_date', '>=');
+		algoliaHelper.numericFilters='';
+	}
+	setURLParams();	
+	algoliaHelper.search();	
+	console.log('lastModified on change ended');
+  });
+  
 
 
   // URL MANAGEMENT
