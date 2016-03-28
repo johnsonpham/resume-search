@@ -1,8 +1,8 @@
 <?php
-$servername = "172.16.22.31";
-$username = "demo";
-$password = "g2JzygMMzyK8NILJLhcU";
-$dbname = "vnw_core";
+$servername = "";
+$username = "";
+$password = "";
+$dbname = "";
 
 $count = 10;
 $totalPage = 2;
