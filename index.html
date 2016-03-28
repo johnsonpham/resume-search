@@ -15,8 +15,16 @@
   <!-- Header -->
   <header>
     <img src="img/instant_search_logo@2x.png"/>
-    <input id="search-input" type="text" autocomplete="off" spellcheck="false" autocorrect="off" placeholder="Job title, location, company, skill..."/>
+    <input id="search-input" type="text" autocomplete="off" spellcheck="true" autocorrect="off" placeholder="Job title, location, company, skill..."/>
     <div id="search-input-icon"></div>
+	<div id ="search-options"> Last modified
+		<select  id = "last-modified" name="last-modified"> 
+			<option value="3">3 days</option>
+			<option value="365">365 days</option>
+			<option value="0">Any</option>
+		</select>
+	</div>
+	
   </header>
   <!-- /Header -->
 
@@ -34,6 +42,7 @@
       <div id="hits"></div>
       <div id="pagination"></div>
     </div>
+	
   </main>
   <!-- /Main -->
 
