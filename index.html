@@ -17,12 +17,6 @@
     <img src="img/instant_search_logo@2x.png"/>
     <input id="search-input" type="text" autocomplete="off" spellcheck="true" autocorrect="off" placeholder="Job title, location, company, skill..."/>
     <div id="search-input-icon"></div>
-	<div id ="search-options"> Last modified
-		<select  id = "last-modified" name="last-modified"> 
-			<option value="3">3 days</option>
-			<option value="365">365 days</option>
-			<option value="0">Any</option>
-		</select>
 	</div>
 	
   </header>
@@ -104,7 +98,9 @@
         {{#values}}
         <li>
           <a href="" class="facet-link toggle-refine {{#disjunctive}}facet-disjunctive{{/disjunctive}} {{#isRefined}}facet-refined{{/isRefined}}" data-facet="{{ facet }}" data-value="{{ name }}">
-            {{ name }}<span class="facet-count">{{ count }}</span>
+            {{#label}} {{ label }} {{/label}}
+            {{^label}} {{ name }} {{/label}}
+            <span class="facet-count">{{ count }}</span>
           </a>
         </li>
         {{/values}}
@@ -151,8 +147,8 @@
 
   <!-- Javascript -->
   <script src="http://cdn.jsdelivr.net/jquery/2.1.4/jquery.min.js"></script>
-  <script src="http://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
-  <script src="http://cdn.jsdelivr.net/algoliasearch.helper/2/algoliasearch.helper.min.js"></script>
+  <script src="http://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.js"></script>
+  <script src="http://cdn.jsdelivr.net/algoliasearch.helper/2/algoliasearch.helper.js"></script>
   <script src="http://cdn.jsdelivr.net/hogan.js/3.0.2/hogan.min.common.js"></script>
   <script src="http://cdn.jsdelivr.net/jquery.ion.rangeslider/2.0.12/js/ion.rangeSlider.min.js"></script>
   <script src="js/app.js"></script>
