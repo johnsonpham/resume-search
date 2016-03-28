@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function () {
 
 
 
@@ -13,15 +13,21 @@ $(document).ready(function() {
     hitsPerPage: 20,
     maxValuesPerFacet: 5,
     facets: ['type'],
-    disjunctiveFacets: ['category_en', 'location_en', 'job_level_en', 'most_recent_employer','updated_date','suggested_salary'
-						, 'exp_years_en', 'attached']
-	,numericFilters: 'updated_date>=1422359939'	
+    disjunctiveFacets: ['category_en', 'location_en', 'job_level_en', 'most_recent_employer', 'suggested_salary'
+      , 'exp_years_en', 'attached'],
+    // numericFilters: 'updated_date>=1422359939'
   };
-  var FACETS_SLIDER = ['updated_date'];
-  var FACETS_ORDER_OF_DISPLAY = ['category_en', 'location_en', 'job_level_en', 'most_recent_employer','updated_date','suggested_salary','exp_years_en','attached'];
-  var FACETS_LABELS = {category_en: 'Category', 'location_en': 'Location', job_level_en: 'Job Level', most_recent_employer:'Most recent employer'
-						, updated_date:'Last modified', suggested_salary:'Suggested Salary'
-						, exp_years_en:'Years of Experience', attached:'Is Attached'};
+  var FACETS_SLIDER = ["suggested_salary"];
+  var FACETS_ORDER_OF_DISPLAY = ['category_en', 'location_en', 'job_level_en', 'most_recent_employer', 'suggested_salary', 'exp_years_en', 'attached'];
+  var FACETS_LABELS = {
+    category_en: 'Category',
+    'location_en': 'Location',
+    job_level_en: 'Job Level',
+    most_recent_employer: 'Most recent employer',
+    suggested_salary: 'Suggested Salary',
+    exp_years_en: 'Years of Experience',
+    attached: 'Resume Type'
+  };
 
   // Client + Helper initialization
   var algolia = algoliasearch(APPLICATION_ID, SEARCH_ONLY_API_KEY);
@@ -36,7 +42,8 @@ $(document).ready(function() {
   $stats = $('#stats');
   $facets = $('#facets');
   $pagination = $('#pagination');
-	// added by Ninh
+
+  // added by Ninh
   $lastModified = $('#last-modified');
 
   // Hogan templates binding
@@ -52,27 +59,26 @@ $(document).ready(function() {
 
   // Input binding
   $searchInput
-  .on('input propertychange', function(e) {
-    var query = e.currentTarget.value;
+    .on('input propertychange', function (e) {
+      var query = e.currentTarget.value;
 
-    toggleIconEmptyInput(query);
-    algoliaHelper.setQuery(query).search();
-  })
-  .focus();
+      toggleIconEmptyInput(query);
+      algoliaHelper.setQuery(query).search();
+    })
+    .focus();
 
   // Search errors
-  algoliaHelper.on('error', function(error) {
+  algoliaHelper.on('error', function (error) {
     console.log(error);
   });
 
   // Update URL
-  algoliaHelper.on('change', function(state) {
+  algoliaHelper.on('change', function (state) {
     setURLParams();
   });
 
   // Search results
-  algoliaHelper.on('result', function(content, state) {
-	console.log('on result');
+  algoliaHelper.on('result', function (content, state) {
     renderStats(content);
     renderHits(content);
     renderFacets(content, state);
@@ -98,8 +104,8 @@ $(document).ready(function() {
   }
 
   function renderHits(content) {
-    $.each(content.hits, function(i, item) {
-      if(!content.hits[i].companyLogo || content.hits[i].companyLogo.length <= 0) {
+    $.each(content.hits, function (i, item) {
+      if (!content.hits[i].companyLogo || content.hits[i].companyLogo.length <= 0) {
         content.hits[i].companyLogo = 'http://www.php.company/img/placeholder-logo.png';
       }
     });
@@ -127,19 +133,52 @@ $(document).ready(function() {
         var to = state.getNumericRefinement(facetName, '<=') || facetContent.max;
         facetContent.from = Math.min(facetContent.max, Math.max(facetContent.min, from));
         facetContent.to = Math.min(facetContent.max, Math.max(facetContent.min, to));
+        // console.log(facetContent);
         facetsHtml += sliderTemplate.render(facetContent);
       }
-
-      // Conjunctive + Disjunctive facets
-      else {
+      else {// Conjunctive + Disjunctive facets
         facetContent = {
           facet: facetName,
           title: FACETS_LABELS[facetName],
           values: content.getFacetValues(facetName, {sortBy: ['isRefined:desc', 'count:desc']}),
           disjunctive: $.inArray(facetName, PARAMS.disjunctiveFacets) !== -1
         };
+        if (facetContent.facet == "attached") {//custom code
+          facetContent.values.forEach(function (v) {
+            (v.name == "false") && (v.label = "Online");
+            (v.name == "true") && (v.label = "Attached");
+          });
+        }
+        if (facetContent.facet == "exp_years_en" || facetContent.facet == "job_level_en") {//custom code
+          var weights = {
+            "15+ years": 1,
+            "10-15 years": 2,
+            "5-10 years": 3,
+            "2-5 years": 4,
+            "1-2 years": 5,
+            "0-1 year": 6,
+            "No experience": 7,
+
+            "President": 1,
+            "Vice President": 2,
+            "CEO": 3,
+            "Director": 4,
+            "Vice Director": 5,
+            "Manager": 6,
+            "Team Leader/Supervisor": 7,
+            "Experienced (Non-Manager)": 8,
+            "New Grad/Entry Level/Internship": 9
+          };
+          facetContent.values.forEach(function (v) {
+            v.weight = weights[v.name];
+          });
+          facetContent.values = facetContent.values.sort(function (a, b) {return a.weight - b.weight;});
+        }
+        console.log(facetContent);
         facetsHtml += facetTemplate.render(facetContent);
       }
+      // console.log(facetContent);
+      // facetsHtml += facetTemplate.render(facetContent);
     }
     $facets.html(facetsHtml);
   }
@@ -156,10 +195,10 @@ $(document).ready(function() {
         max: slider.data('max'),
         from: slider.data('from'),
         to: slider.data('to'),
-        prettify: function(num) {
+        prettify: function (num) {
           return '$' + parseInt(num, 10);
         },
-        onFinish: function(data) {
+        onFinish: function (data) {
           var lowerBound = state.getNumericRefinement(facetName, '>=');
           lowerBound = lowerBound && lowerBound[0] || data.min;
           if (data.from !== lowerBound) {
@@ -199,7 +238,6 @@ $(document).ready(function() {
     };
     $pagination.html(paginationTemplate.render(pagination));
   }
-
 
 
   // NO RESULTS
@@ -249,58 +287,57 @@ $(document).ready(function() {
   }
 
 
-
   // EVENTS BINDING
   // ==============
 
-  $(document).on('click', '.toggle-refine', function(e) {
+  $(document).on('click', '.toggle-refine', function (e) {
     e.preventDefault();
     algoliaHelper.toggleRefine($(this).data('facet'), $(this).data('value')).search();
   });
-  $(document).on('click', '.go-to-page', function(e) {
+  $(document).on('click', '.go-to-page', function (e) {
     e.preventDefault();
     $('html, body').animate({scrollTop: 0}, '500', 'swing');
     algoliaHelper.setCurrentPage(+$(this).data('page') - 1).search();
   });
-  $sortBySelect.on('change', function(e) {
+  $sortBySelect.on('change', function (e) {
     e.preventDefault();
     algoliaHelper.setIndex(INDEX_NAME + $(this).val()).search();
   });
-  $searchInputIcon.on('click', function(e) {
+  $searchInputIcon.on('click', function (e) {
     e.preventDefault();
     $searchInput.val('').keyup().focus();
   });
-  $(document).on('click', '.remove-numeric-refine', function(e) {
+  $(document).on('click', '.remove-numeric-refine', function (e) {
     e.preventDefault();
     algoliaHelper.removeNumericRefinement($(this).data('facet'), $(this).data('value')).search();
   });
-  $(document).on('click', '.clear-all', function(e) {
+  $(document).on('click', '.clear-all', function (e) {
     e.preventDefault();
     $searchInput.val('').focus();
     algoliaHelper.setQuery('').clearRefinements().search();
   });
   // Added by Ninh
-  $lastModified.on('change', function(e){
-	console.log('lastModified on change');
-	//e.preventDefault();
-
-	//facetName = 'updated_date';	
-	lastModifiedSelectVal= parseInt($("#last-modified option:selected").val());
-	//alert($lastModifiedSelectVal);
-	if (lastModifiedSelectVal >  -1) {
-		lastModified4Search = ($.now()/1000) - (lastModifiedSelectVal*24*3600);	
-		//algoliaHelper.removeNumericFilters('updated_date', '>=');		
-		algoliaHelper.numericFilters='updated_date >= ' + lastModified4Search;
-	} else {
-		//alert('Not search by date'+PARAMS.numericFilters);
-		//algoliaHelper.removeNumericRefinement('updated_date', '>=');
-		algoliaHelper.numericFilters='';
-	}
-	setURLParams();	
-	algoliaHelper.search();	
-	console.log('lastModified on change ended');
-  });
-  
+  // $lastModified.on('change', function (e) {
+  //   console.log('lastModified on change');
+  //   //e.preventDefault();
+  //
+  //   //facetName = 'updated_date';
+  //   lastModifiedSelectVal = parseInt($("#last-modified option:selected").val());
+  //   //alert($lastModifiedSelectVal);
+  //   if (lastModifiedSelectVal > -1) {
+  //     lastModified4Search = ($.now() / 1000) - (lastModifiedSelectVal * 24 * 3600);
+  //     //algoliaHelper.removeNumericFilters('updated_date', '>=');
+  //     algoliaHelper.numericFilters = 'updated_date >= ' + lastModified4Search;
+  //   }
+  //   else {
+  //     //alert('Not search by date'+PARAMS.numericFilters);
+  //     //algoliaHelper.removeNumericRefinement('updated_date', '>=');
+  //     algoliaHelper.numericFilters = '';
+  //   }
+  //   setURLParams();
+  //   algoliaHelper.search();
+  //   console.log('lastModified on change ended');
+  // });
 
 
   // URL MANAGEMENT
@@ -316,6 +353,7 @@ $(document).ready(function() {
 
   var URLHistoryTimer = Date.now();
   var URLHistoryThreshold = 700;
+
   function setURLParams() {
     var trackedParameters = ['attribute:*'];
     if (algoliaHelper.state.query.trim() !== '')  trackedParameters.push('query');
@@ -325,23 +363,26 @@ $(document).ready(function() {
     var URLParams = window.location.search.slice(1);
     var nonAlgoliaURLParams = algoliasearchHelper.url.getUnrecognizedParametersInQueryString(URLParams);
     var nonAlgoliaURLHash = window.location.hash;
-    var helperParams = algoliaHelper.getStateAsQueryString({filters: trackedParameters, moreAttributes: nonAlgoliaURLParams});
+    var helperParams = algoliaHelper.getStateAsQueryString({
+      filters: trackedParameters,
+      moreAttributes: nonAlgoliaURLParams
+    });
     if (URLParams === helperParams) return;
 
     var now = Date.now();
     if (URLHistoryTimer > now) {
       window.history.replaceState(null, '', '?' + helperParams + nonAlgoliaURLHash);
-    } else {
+    }
+    else {
       window.history.pushState(null, '', '?' + helperParams + nonAlgoliaURLHash);
     }
-    URLHistoryTimer = now+URLHistoryThreshold;
+    URLHistoryTimer = now + URLHistoryThreshold;
   }
 
-  window.addEventListener('popstate', function() {
+  window.addEventListener('popstate', function () {
     initFromURLParams();
     algoliaHelper.search();
   });
-
 
 
   // HELPER METHODS
