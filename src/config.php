@@ -1,8 +1,20 @@
 <?php
-$servername = "";
-$username = "";
-$password = "";
-$dbname = "";
+const PRINT_SQL = false;
 
-$count = 10;
-$totalPage = 2;
+const SERVER_NAME = "172.16.22.31";
+const USERNAME = "demo";
+const PASSWORD = "g2JzygMMzyK8NILJLhcU";
+const DB_NAME = "vnw_core";
+
+const ITEMS_PER_BATCH = 10;
+const TOTAL_BATCHES = 2;
+
+const RS_MULTICREDIT_JAPANESE =	10;
+const RS_MULTICREDIT_JAPANESE_ADVANCED =		10;
+const RS_MULTICREDIT_JAPANESE_BASIC	=	1;
+const RS_MULTICREDIT_JAPANESE_INTERMEDIATE	=	10;
+const RS_MULTICREDIT_JAPANESE_NATIVE	=	10;
+const RS_MULTICREDIT_JOBLEVEL_EXPERIENCED	=	2;
+const RS_MULTICREDIT_JOBLEVEL_GRADUATE	=	1;
+const RS_MULTICREDIT_JOBLEVEL_MANAGER	=	3;
+
