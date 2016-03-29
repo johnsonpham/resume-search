@@ -1,7 +1,24 @@
 <!doctype html>
 <html>
 <head>
-  <title>Job Search</title>
+  <meta name="viewport" content="width=device-width">
+  <meta name="format-detection" content="telephone=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+  <meta name="author" content="">
+  <link rel="shortcut icon" href="http://advice.vietnamworks.com/misc/favicon.ico" type="image/x-icon"/>
+  <title>Jobs, find jobs, job search, executive and manager jobs - VietnamWorks</title>
+  <meta name="Robots" content="index, follow">
+  <meta name="Description" content="Top job search, find jobs and career website in Vietnam. Find jobs and post resume to apply new jobs. Search jobs from 4,000+ new jobs updated daily.">
+  <meta name="Keywords" content="vietnamworks, vietnamworks.com, jobs, search jobs, find jobs, vietnam job, recruitment, employment, career, executive jobs, job opportunities, job seeker, finding job, job site, online jobs, top jobs">
+  <meta property="og:image" content="http://images.vietnamworks.com/img/thumbnail.png"/>
+  <meta property="og:title" content="Jobs, find jobs, job search, executive and manager jobs - VietnamWorks"/>
+  <meta property="og:url" content="http://www.vietnamworks.com/en/"/>
+  <meta property="og:title_name" content="www.vietnamworks.com"/>
+  <meta property="og:description" content="Top job search, find jobs and career website in Vietnam. Find jobs and post resume to apply new jobs. Search jobs from 4,000+ new jobs updated daily."/>
+  <!-- FONT -->
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500,500italic&subset=latin,vietnamese' rel='stylesheet' type='text/css'>
+  <link href='https://fortawesome.github.io/Font-Awesome/assets/font-awesome/css/font-awesome.css' rel='stylesheet' type='text/css'>
+
   <!-- CSS -->
   <link rel="stylesheet" type="text/css" href="http://cdn.jsdelivr.net/jquery.ion.rangeslider/2.0.12/css/ion.rangeSlider.css">
   <link rel="stylesheet" type="text/css" href="http://cdn.jsdelivr.net/jquery.ion.rangeslider/2.0.12/css/ion.rangeSlider.skinFlat.css">
@@ -12,146 +29,220 @@
 <body>
 
 
-  <!-- Header -->
-  <header>
-    <img src="img/instant_search_logo@2x.png"/>
-    <input id="search-input" type="text" autocomplete="off" spellcheck="true" autocorrect="off" placeholder="Job title, location, company, skill..."/>
-    <div id="search-input-icon"></div>
-	</div>
-	
-  </header>
-  <!-- /Header -->
+<!-- Header -->
+<header>
+  <div class="top-side">
+    <nav class="navbar navbar-static-top hidden-print" role="navigation" style="margin-bottom: 0">
+      <div class="navbar-header">
+        <div class="m-t-sm m-b-xs m-l pull-left">
+          <a href="http://employer.staging.vietnamworks.com" target="_blank">
+            <img src="http://images.staging.vietnamworks.com/img/jobseekers/logo.png" alt="Vietnamworks - Job Search, career and employment in Vietnam" title="Vietnamworks - Job Search, career and employment in Vietnam" height="45">
+          </a>
+        </div>
+      </div>
+      <ul class="nav navbar-top-links navbar-right">
+        <li>
+          <span> <i class="fa fa-phone"></i> <strong>Hotline: 1800 7100 </strong></span>
+        </li>
+        &nbsp;&nbsp;
+        <li>
+          <span> <i class="fa fa-phone"></i> HCM: 08 3925 8456 </span>
+        </li>
+        &nbsp;&nbsp;
+        <li>
+          <span> <i class="fa fa-phone"></i> HN: 04 3944 0568 </span>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<!-- /Header -->
 
 
-  <!-- Main -->
-  <main>
-    <!-- Left Column -->
-    <div id="left-column">
-      <div id="facets"></div>
+<!-- Main -->
+<main>
+  <!-- Left Column -->
+  <div id="left-column">
+    <div id="facets"></div>
+  </div>
+
+  <!-- Right Column -->
+  <div id="right-column">
+    <div class="search-form">
+      <h3>Search Resume</h3>
+      <input id="search-input" type="text" autocomplete="off" spellcheck="true" autocorrect="off" placeholder="Keyword. e.g. Developer"/>
+      <!--<button type="submit" id="search-input-icon" name="btnResumeSearch" value="1" class="btn btn-warning">-->
+        <!--<i class="fa fa-search"></i> Search-->
+      <!--</button>-->
+      <div id="search-input-icon"></div>
     </div>
-
-    <!-- Right Column -->
-    <div id="right-column">
+    <div class="search-results">
       <div id="stats"></div>
       <div id="hits"></div>
       <div id="pagination"></div>
     </div>
-	
-  </main>
-  <!-- /Main -->
+  </div>
 
-  <!-- Hit template -->
-  <script type="text/template" id="hit-template">
-    {{#hits}}
-    <div class="hit">
-      <div class="hit-image">
-        <img src="img/person-placeholder.jpg" alt="{{ name }}">
+</main>
+<!-- /Main -->
+
+<!-- Hit template -->
+<script type="text/template" id="hit-template">
+  {{#hits}}
+  <div class="hit">
+    <div class="hit-content jobseeker-item">
+      <div class="col-sm-12">
+        <h3 class="hit-name">
+          <a target='_blank'  href="http://employer.staging.vietnamworks.com/v2/resume/detail/{{{objectID}}}">{{{fullname}}}</a>
+        </h3>
+        <h4>{{{ _highlightResult.most_recent_position.value }}}</h4>
       </div>
-      <div class="hit-content">
-		<h4 class="hit-name">
-         <a target='_blank'  href="http://employer.staging.vietnamworks.com/v2/resume/detail/{{{objectID}}}">
-		 {{{ _highlightResult.most_recent_position.value }}}</a>
-       </h4>	   	
-		<h3 class="hit-price">${{{ suggested_salary }}}</h3>
-		<h3 class="hit-price">{{{ exp_years_en }}}</h3>
-	    <p class="hit-description">Other job titles: {{{ _highlightResult.desired_job_title.value }}} -- {{{ _highlightResult.exp_title.value }}}</p>
-		
-        <h3 class="hit-right">Job Level: {{{ _highlightResult.job_level_en.value }}}</h3>
-		<h3 class="hit-right">Location: {{{ _highlightResult.location_en.value }}}</h3>
-		<h3 class="hit-left">Category: {{{ _highlightResult.category_en.value }}}</h3>		
-		
-        <!--<p class="hit-description">Fullname: {{{ _highlightResult.fullname.value }}}</p>-->
-        <p class="hit-description">Current Employer: {{{_highlightResult.most_recent_employer.value }}}</p>
-		<p class="hit-description">Last Modified: {{{ updated_date }}}</p>
-		<p class="hit-description">Completion: {{{ completion_rate }}}</p>
-		<p class="hit-description">Is Attached: {{{ attached }}}</p>		
-		<p class="hit-description">Views: {{{ total_views }}}</p>
-		<p class="hit-description">Downloads: {{{ total_downloads }}}</p>
-
-        <!--<div class="hit-description" style="margin-bottom: 5px">-->
-          <!--Locations:-->
-          <!--{{#_highlightResult.locations}}-->
-            <!--<span class="label label-skill">{{{value}}}</span>-->
-          <!--{{/_highlightResult.locations}}-->
-        <!--</div>-->
-        <!--<div class="hit-description">-->
-          <!--Skills:-->
-          <!--{{#_highlightResult.tags}}-->
-            <!--<span class="label label-skill">{{{value}}}</span>-->
-          <!--{{/_highlightResult.tags}}-->
-        <!--</div>-->
+      <div class="col-sm-6">
+        <div class="row">
+          <div class="col-sm-6 text-clip">
+            <i data-toggle="tooltip" title="" data-container=".search-results" class="fa fa-fw fa-folder-open" data-original-title="Industry"></i>
+            {{{ _highlightResult.category_en.value }}}
+          </div>
+          <div class="col-sm-6 text-clip">
+            <i data-toggle="tooltip" title="" data-container=".search-results" class="fa fa-fw fa-map-marker" data-original-title="Location"></i>
+            {{{ _highlightResult.location_en.value }}}
+          </div>
+          <div class="col-sm-6 text-clip">
+            <i data-toggle="tooltip" title="" data-container=".search-results" class="fa fa-fw fa-suitcase" data-original-title="Job Level"></i>
+            {{{ _highlightResult.job_level_en.value }}}
+          </div>
+          {{#_highlightResult.most_recent_employer.value}}
+          <div class="col-sm-6 text-clip">
+            <i data-container=".search-results" class="fa fa-fw fa-building" data-original-title="Recent Employer"></i>
+            {{{_highlightResult.most_recent_employer.value }}}
+          </div>
+          {{/_highlightResult.most_recent_employer.value}}
+        </div>
       </div>
+      <div class="col-sm-2 extra-info text-center">
+        <strong data-toggle="tooltip" title="Year of experience">{{{ exp_years_en }}}</strong>
+        {{#suggested_salary}} <br>${{{ suggested_salary }}} {{/suggested_salary}}
+      </div>
+      <div class="col-sm-1 text-center">
+        <div data-toggle="tooltip" title="CV completion">
+        {{{ completion_rate }}} %<br>
+        <div class="completion-cv">
+          <div class="percent-completion" style='width: {{{ completion_rate }}}%'></div>
+        </div>
+        </div>
+      </div>
+      <div class="col-sm-3 profile-info text-center">
+        <ul>
+          {{#total_views}}
+          <li data-toggle="tooltip" title="Number of view"><i class="fa fa-fw fa-eye"></i> {{{ total_views }}}</li>
+          {{/total_views}}
+          {{#total_downloads}}
+          <li data-toggle="tooltip" title="Number of download"><i class="fa fa-fw fa-download"></i> {{{ total_downloads }}}</li>
+          {{/total_downloads}}
+          {{#credits}}
+          <li data-toggle="tooltip" title="It takes <strong>{{{credits}}}</strong> credit to <br/> download this resume">
+            <i class="fa fa-fw fa-diamond"></i> {{{credits}}}</li>
+          {{/credits}}
+          {{#attached}}
+          <li data-toggle="tooltip" title="This profile contains <br/> an attached CV">
+            <i class="fa fa-paperclip"></i></li> <!--  {{{ attached }}} -->
+          {{/attached}}
+        </ul>
+        Last Modified: {{{ updated_date_label }}}
+      </div>
+
+      <!--<p class="hit-description">Other job titles: {{{ _highlightResult.desired_job_title.value }}} &#45;&#45; {{{ _highlightResult.exp_title.value }}}</p>-->
+
+
+
+      <!--<p class="hit-description">Fullname: {{{ _highlightResult.fullname.value }}}</p>-->
+
+      <!--<div class="hit-description" style="margin-bottom: 5px">-->
+      <!--Locations:-->
+      <!--{{#_highlightResult.locations}}-->
+      <!--<span class="label label-skill">{{{value}}}</span>-->
+      <!--{{/_highlightResult.locations}}-->
+      <!--</div>-->
+      <!--<div class="hit-description">-->
+      <!--Skills:-->
+      <!--{{#_highlightResult.tags}}-->
+      <!--<span class="label label-skill">{{{value}}}</span>-->
+      <!--{{/_highlightResult.tags}}-->
+      <!--</div>-->
     </div>
-    {{/hits}}
-  </script>
+  </div>
+  {{/hits}}
+</script>
 
-  <!-- Stats template -->
-  <script type="text/template" id="stats-template">
-    {{ nbHits }} Result{{#nbHits_plural}}s{{/nbHits_plural}} <span class="found-in">Found in {{ processingTimeMS }}ms</span>
-  </script>
+<!-- Stats template -->
+<script type="text/template" id="stats-template">
+  {{ nbHits }} Result{{#nbHits_plural}}s{{/nbHits_plural}} <span class="found-in">Found in {{ processingTimeMS }}ms</span>
+</script>
 
-  <!-- Facet template -->
-  <script type="text/template" id="facet-template">
-    <div class="facet">
-      <h5>{{ title }}</h5>
-      <ul>
-        {{#values}}
-        <li>
-          <a href="" class="facet-link toggle-refine {{#disjunctive}}facet-disjunctive{{/disjunctive}} {{#isRefined}}facet-refined{{/isRefined}}" data-facet="{{ facet }}" data-value="{{ name }}">
-            {{#label}} {{ label }} {{/label}}
-            {{^label}} {{ name }} {{/label}}
-            <span class="facet-count">{{ count }}</span>
-          </a>
-        </li>
-        {{/values}}
-      </ul>
-    </div>
-  </script>
-
-  <!-- Slider template -->
-  <script type="text/template" id="slider-template">
-    <div class="facet">
-      <h5>{{ title }}</h5>
-      <input type="text" id="{{ facet }}-slider" data-min="{{ min }}" data-max="{{ max }}" data-from="{{ from }}" data-to="{{ to }}"/>
-    </div>
-  </script>
-
-  <!-- Pagination template -->
-  <script type="text/template" id="pagination-template">
+<!-- Facet template -->
+<script type="text/template" id="facet-template">
+  <div class="facet">
+    <h5>{{ title }}</h5>
     <ul>
-      <li {{^prev_page}}class="disabled"{{/prev_page}}><a href="#" {{#prev_page}}class="go-to-page" data-page="{{ prev_page }}"{{/prev_page}}>&#60;</a></li>
-      {{#pages}}
-      <li class="{{#current}}active{{/current}} {{#disabled}}disabled{{/disabled}}"><a href="#" {{^disabled}} class="go-to-page" data-page="{{ number }}" {{/disabled}}>{{ number }}</a></li>
-      {{/pages}}
-      <li {{^next_page}}class="disabled"{{/next_page}}><a href="#" {{#next_page}}class="go-to-page" data-page="{{ next_page }}"{{/next_page}}>&#62;</a></li>
+      {{#values}}
+      <li>
+        <a href="" class="facet-link toggle-refine {{#disjunctive}}facet-disjunctive{{/disjunctive}} {{#isRefined}}facet-refined{{/isRefined}}" data-facet="{{ facet }}" data-value="{{ name }}">
+          {{#label}} {{ label }} {{/label}}
+          {{^label}} {{ name }} {{/label}}
+          <span class="facet-count">{{ count }}</span>
+        </a>
+      </li>
+      {{/values}}
     </ul>
-  </script>
+  </div>
+</script>
 
-  <!-- No-Results template -->
-  <script type="text/template" id="no-results-template">
-    <div id="no-results-message">
-      <p>We didn't find any results for the search <em>"{{ query }}"</em>.</p>
-      <ul>
-        {{#filters}}
-        <li class="{{ class }}" data-facet="{{ facet }}" data-value="{{ facet_value }}">
-          {{ label }}<span class="value">{{ label_value }}</span><a class="remove"><img src="img/remove.svg"/></a>
-        </li>
-        {{/filters}}
-        <br>
-        <a href="" class='clear-all'>Clear all</a>
-      </ul>
-    </div>
-  </script>
+<!-- Slider template -->
+<script type="text/template" id="slider-template">
+  <div class="facet">
+    <h5>{{ title }}</h5>
+    <input type="text" id="{{ facet }}-slider" data-min="{{ min }}" data-max="{{ max }}" data-from="{{ from }}" data-to="{{ to }}"/>
+  </div>
+</script>
+
+<!-- Pagination template -->
+<script type="text/template" id="pagination-template">
+  <ul>
+    <li {{^prev_page}}class="disabled"{{/prev_page}}><a href="#" {{#prev_page}}class="go-to-page" data-page="{{ prev_page }}"{{/prev_page}}>&#60;</a></li>
+    {{#pages}}
+    <li class="{{#current}}active{{/current}} {{#disabled}}disabled{{/disabled}}"><a href="#" {{^disabled}} class="go-to-page" data-page="{{ number }}" {{/disabled}}>{{ number }}</a></li>
+    {{/pages}}
+    <li {{^next_page}}class="disabled"{{/next_page}}><a href="#" {{#next_page}}class="go-to-page" data-page="{{ next_page }}"{{/next_page}}>&#62;</a></li>
+  </ul>
+</script>
+
+<!-- No-Results template -->
+<script type="text/template" id="no-results-template">
+  <div id="no-results-message">
+    <p>We didn't find any results for the search <em>"{{ query }}"</em>.</p>
+    <ul>
+      {{#filters}}
+      <li class="{{ class }}" data-facet="{{ facet }}" data-value="{{ facet_value }}">
+        {{ label }}<span class="value">{{ label_value }}</span><a class="remove"><img src="img/remove.svg"/></a>
+      </li>
+      {{/filters}}
+      <br>
+      <a href="" class='clear-all'>Clear all</a>
+    </ul>
+  </div>
+</script>
 
 
 
-  <!-- Javascript -->
-  <script src="http://cdn.jsdelivr.net/jquery/2.1.4/jquery.min.js"></script>
-  <script src="http://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.js"></script>
-  <script src="http://cdn.jsdelivr.net/algoliasearch.helper/2/algoliasearch.helper.js"></script>
-  <script src="http://cdn.jsdelivr.net/hogan.js/3.0.2/hogan.min.common.js"></script>
-  <script src="http://cdn.jsdelivr.net/jquery.ion.rangeslider/2.0.12/js/ion.rangeSlider.min.js"></script>
-  <script src="js/app.js"></script>
-  <!-- /Javascript -->
+<!-- Javascript -->
+<script src="http://cdn.jsdelivr.net/jquery/2.1.4/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="http://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.js"></script>
+<script src="http://cdn.jsdelivr.net/algoliasearch.helper/2/algoliasearch.helper.js"></script>
+<script src="http://cdn.jsdelivr.net/hogan.js/3.0.2/hogan.min.common.js"></script>
+<script src="http://cdn.jsdelivr.net/jquery.ion.rangeslider/2.0.12/js/ion.rangeSlider.min.js"></script>
+<script src="js/moment.js"></script>
+<script src="js/app.js"></script>
+<!-- /Javascript -->
 </body>
 </html>

@@ -8,7 +8,7 @@ $(document).ready(function () {
   // Replace with your own values
   var APPLICATION_ID = 'G9K82IDUDX';
   var SEARCH_ONLY_API_KEY = '876286a34d35bf9c8b4a8d1398c22a6a';
-  var INDEX_NAME = 'resumes_slave01';
+  var INDEX_NAME = 'resumes';
   var PARAMS = {
     hitsPerPage: 20,
     maxValuesPerFacet: 5,
@@ -424,5 +424,10 @@ $(document).ready(function () {
     $searchInputIcon.toggleClass('empty', query.trim() !== '');
   }
 
+/// TOOLTIP
+  function tooltip(){
+    $('[data-toggle="tooltip"]').tooltip({html:true});
+  };
+  setTimeout(tooltip, 1000);
 
 });
