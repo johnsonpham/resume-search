@@ -8,26 +8,28 @@ $(document).ready(function () {
   // Replace with your own values
   var APPLICATION_ID = 'G9K82IDUDX';
   var SEARCH_ONLY_API_KEY = '876286a34d35bf9c8b4a8d1398c22a6a';
-  var INDEX_NAME = 'resumes';
+  var INDEX_NAME = 'resumes_slave01';
   var PARAMS = {
     hitsPerPage: 20,
     maxValuesPerFacet: 5,
     facets: ['type'],
-    disjunctiveFacets: ['category_en', 'location_en', 'job_level_en', 'most_recent_employer', 'suggested_salary'
-      , 'exp_years_en', 'attached'],
+    disjunctiveFacets: ['category_en', 'location_en', 'job_level_en', 'most_recent_employer', 'suggested_salary', "updated_date",'exp_years_en', 'attached'],
     // numericFilters: 'updated_date>=1422359939'
   };
-  var FACETS_SLIDER = ["suggested_salary"];
-  var FACETS_ORDER_OF_DISPLAY = ['category_en', 'location_en', 'job_level_en', 'most_recent_employer', 'suggested_salary', 'exp_years_en', 'attached'];
+  var FACETS_SLIDER = ["suggested_salary", "updated_date"];
+  var FACETS_ORDER_OF_DISPLAY = ['category_en', 'location_en', 'job_level_en', 'most_recent_employer', 'suggested_salary', "updated_date",'exp_years_en', 'attached'];
   var FACETS_LABELS = {
     category_en: 'Category',
     'location_en': 'Location',
     job_level_en: 'Job Level',
     most_recent_employer: 'Most recent employer',
     suggested_salary: 'Suggested Salary',
+    updated_date: "Last Modified",
     exp_years_en: 'Years of Experience',
     attached: 'Resume Type'
   };
+
+  var sliders = {};
 
   // Client + Helper initialization
   var algolia = algoliasearch(APPLICATION_ID, SEARCH_ONLY_API_KEY);
@@ -174,7 +176,6 @@ $(document).ready(function () {
           });
           facetContent.values = facetContent.values.sort(function (a, b) {return a.weight - b.weight;});
         }
-        console.log(facetContent);
         facetsHtml += facetTemplate.render(facetContent);
       }
       // console.log(facetContent);
@@ -213,6 +214,36 @@ $(document).ready(function () {
           }
         }
       };
+
+      if (facetName == "updated_date") {
+        sliderOptions = {
+          type: 'double',
+          grid: true,
+          min: slider.data('min'),
+          max: slider.data('max'),
+          from: slider.data('from'),
+          to: slider.data('to'),
+          step: 24 * 60 * 60 * 30,
+          prettify: function (num) {
+            return moment.unix(num).format("DD/MM/YYYY");
+          },
+          onFinish: function (data) {
+            var lowerBound = state.getNumericRefinement(facetName, '>=');
+            lowerBound = lowerBound && lowerBound[0] || data.min;
+            if (data.from !== lowerBound) {
+              algoliaHelper.removeNumericRefinement(facetName, '>=');
+              algoliaHelper.addNumericRefinement(facetName, '>=', data.from).search();
+            }
+            var upperBound = state.getNumericRefinement(facetName, '<=');
+            upperBound = upperBound && upperBound[0] || data.max;
+            if (data.to !== upperBound) {
+              algoliaHelper.removeNumericRefinement(facetName, '<=');
+              algoliaHelper.addNumericRefinement(facetName, '<=', data.to).search();
+            }
+          }
+        }
+      }
+
       slider.ionRangeSlider(sliderOptions);
     }
   }
