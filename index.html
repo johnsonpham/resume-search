@@ -31,15 +31,30 @@
 
 <!-- Header -->
 <header>
-  <div class="logo">
-    <img src="http://images.vietnamworks.com/img/jobseekers/logo.png"/>
+  <div class="top-side">
+    <nav class="navbar navbar-static-top hidden-print" role="navigation" style="margin-bottom: 0">
+      <div class="navbar-header">
+        <div class="m-t-sm m-b-xs m-l pull-left">
+          <a href="http://employer.staging.vietnamworks.com" target="_blank">
+            <img src="http://images.staging.vietnamworks.com/img/jobseekers/logo.png" alt="Vietnamworks - Job Search, career and employment in Vietnam" title="Vietnamworks - Job Search, career and employment in Vietnam" height="45">
+          </a>
+        </div>
+      </div>
+      <ul class="nav navbar-top-links navbar-right">
+        <li>
+          <span> <i class="fa fa-phone"></i> <strong>Hotline: 1800 7100 </strong></span>
+        </li>
+        &nbsp;&nbsp;
+        <li>
+          <span> <i class="fa fa-phone"></i> HCM: 08 3925 8456 </span>
+        </li>
+        &nbsp;&nbsp;
+        <li>
+          <span> <i class="fa fa-phone"></i> HN: 04 3944 0568 </span>
+        </li>
+      </ul>
+    </nav>
   </div>
-  <div class="search-form">
-    <input id="search-input" type="text" autocomplete="off" spellcheck="true" autocorrect="off" placeholder="Job title, location, company, skill..."/>
-    <div id="search-input-icon"></div>
-  </div>
-  </div>
-
 </header>
 <!-- /Header -->
 
@@ -53,9 +68,19 @@
 
   <!-- Right Column -->
   <div id="right-column">
-    <div id="stats"></div>
-    <div id="hits"></div>
-    <div id="pagination"></div>
+    <div class="search-form">
+      <h3>Search Resume</h3>
+      <input id="search-input" type="text" autocomplete="off" spellcheck="true" autocorrect="off" placeholder="Keyword. e.g. Developer"/>
+      <!--<button type="submit" id="search-input-icon" name="btnResumeSearch" value="1" class="btn btn-warning">-->
+        <!--<i class="fa fa-search"></i> Search-->
+      <!--</button>-->
+      <div id="search-input-icon"></div>
+    </div>
+    <div class="search-results">
+      <div id="stats"></div>
+      <div id="hits"></div>
+      <div id="pagination"></div>
+    </div>
   </div>
 
 </main>
@@ -88,7 +113,7 @@
           </div>
           {{#_highlightResult.most_recent_employer.value}}
           <div class="col-sm-6 text-clip">
-            <i data-toggle="tooltip" title="" data-container=".search-results" class="fa fa-fw fa-building" data-original-title="Recent Employer"></i>
+            <i data-container=".search-results" class="fa fa-fw fa-building" data-original-title="Recent Employer"></i>
             {{{_highlightResult.most_recent_employer.value }}}
           </div>
           {{/_highlightResult.most_recent_employer.value}}
@@ -99,9 +124,11 @@
         {{#suggested_salary}} <br>${{{ suggested_salary }}} {{/suggested_salary}}
       </div>
       <div class="col-sm-1 text-center">
+        <div data-toggle="tooltip" title="CV completion">
         {{{ completion_rate }}} %<br>
         <div class="completion-cv">
           <div class="percent-completion" style='width: {{{ completion_rate }}}%'></div>
+        </div>
         </div>
       </div>
       <div class="col-sm-3 profile-info text-center">

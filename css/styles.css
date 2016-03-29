@@ -5,7 +5,7 @@
 body{
 	width: 100%;
 	font-family: 'Roboto', sans-serif;
-	padding: 10px;
+	padding: 0 10px;
 	background-color: #f3f3f4;
 	color: #333;
 }
@@ -19,8 +19,7 @@ header, main, #no-results, footer {
 }
 main {
 	min-height: 360px;
-	display: inline-block;
-	padding: 20px 0;
+	display: flex;
 }
 #left-column {
 	float: left;
@@ -31,14 +30,33 @@ main {
 	border-top: 1px solid #c9c9c9;
 }
 #right-column {
-	width: 76%;
-	margin-left: 24%;
+	width: 77%;
 	box-sizing: border-box;
-	padding: 20px;
+	padding: 0 0 0 20px;
+}
+.search-form{
+	background-color: #fff;
+	border-top: 3px solid #c9c9c9;
+	width: 100%;
+	padding: 15px;
+	box-sizing: border-box;
+	margin: 0 0 20px 0;
+}
+.search-form h3{
+	display: inline-block;
+	font-size: 14px;
+	margin: 0 0 15px;
+	padding: 0;
+	text-overflow: ellipsis;
+	float: left;
+}
+.search-results{
 	background-color: #fff;
 	border-top: 1px solid #c9c9c9;
+	width: 100%;
+	box-sizing: border-box;
+	padding: 25px 15px;
 }
-
 a{
 	color: #00b9f2;
 }
@@ -50,21 +68,19 @@ a:hover{
 // ------------------------- */
 
 header {
-	border-top: 3px solid #c9c9c9;
 	position: relative;
-	height: 120px;
-	padding: 20px;
-	background-color: #fff;
+	padding: 5px 0;
+	width: 100%;
+}
+.navbar-right{margin-right: 0; padding-top: 15px;}
+.navbar-top-links li {
+	display: inline-block;
 }
 .logo{
 	width: 23%;
 	float: left;
 }
-.search-form{
-	width: 74%;
-	margin-left: 26%;
-}
-header img {
+header .logo img {
 	width: 100%;
 	box-sizing: border-box;
 	padding-right: 20px;
@@ -72,13 +88,12 @@ header img {
 
 }
 #search-input {
-	font-size: 28px;
+	font-size: 14px;
 	font-weight: 100;
 	width: 100%;
 	box-sizing: border-box;
-	padding: 10px 0 6px;
-	border: none;
-	border-bottom: 2px solid #eee;
+	padding: 10px;
+	border: 1px solid #c9c9c9;
 }
 #search-input, #search-input:focus {
 	transition: border-color .3s ease-in;
@@ -96,8 +111,8 @@ header img {
 }
 #search-input-icon:before {
 	position: absolute;
-	right: 0;
-	bottom: 15px;
+	right: 10px;
+	bottom: 10px;
 	width: 20px;
 	height: 20px;
 	content: '';
@@ -157,6 +172,7 @@ header img {
 .hit-content .hit-price, .hit-content .hit-name {
 	font-weight: normal;
 	margin-top: 0;
+	font-size: 18px;
 }
 
 .hit-content .hit-left {
@@ -302,6 +318,7 @@ header img {
 }
 #stats .found-in {
 	font-weight: 300;
+	font-size: 16px;
 }
 
 
@@ -316,7 +333,7 @@ header img {
 	margin: 0 0 6px;
 	padding: 0 0 6px;
 	text-transform: uppercase;
-	border-bottom: 2px solid #eee;
+	border-bottom: 1px solid #eee;
 }
 .facet ul {
 	margin: 0;
