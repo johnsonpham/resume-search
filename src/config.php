@@ -1,10 +1,10 @@
 <?php
 const PRINT_SQL = false;
 
-const SERVER_NAME = "172.16.22.31";
-const USERNAME = "demo";
-const PASSWORD = "g2JzygMMzyK8NILJLhcU";
-const DB_NAME = "vnw_core";
+const SERVER_NAME = "";
+const USERNAME = "";
+const PASSWORD = "";
+const DB_NAME = "";
 
 const ITEMS_PER_BATCH = 10;
 const TOTAL_BATCHES = 2;
