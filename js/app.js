@@ -110,6 +110,7 @@ $(document).ready(function () {
       if (!content.hits[i].companyLogo || content.hits[i].companyLogo.length <= 0) {
         content.hits[i].companyLogo = 'http://www.php.company/img/placeholder-logo.png';
       }
+      item.updated_date_label = moment.unix(item.updated_date).format("DD/MM/YYYY");
     });
 
     $hits.html(hitTemplate.render(content));
