@@ -13,11 +13,15 @@ $(document).ready(function () {
     hitsPerPage: 20,
     maxValuesPerFacet: 5,
     facets: ['type'],
-    disjunctiveFacets: ['category_en', 'location_en', 'job_level_en', 'most_recent_employer', 'suggested_salary', "updated_date",'exp_years_en', 'attached'],
+    disjunctiveFacets: ['category_en', 'location_en', 'job_level_en', 'most_recent_employer', 
+						'suggested_salary', "updated_date",'exp_years_en', 'attached',
+						'nationality_en','language1_name','language1_proficiency_en'],
     // numericFilters: 'updated_date>=1422359939'
   };
   var FACETS_SLIDER = ["suggested_salary", "updated_date"];
-  var FACETS_ORDER_OF_DISPLAY = ['category_en', 'location_en', 'job_level_en', 'most_recent_employer', 'suggested_salary', "updated_date",'exp_years_en', 'attached'];
+  var FACETS_ORDER_OF_DISPLAY = ['category_en', 'location_en', 'job_level_en', 'most_recent_employer', 'suggested_salary', 
+								'updated_date','exp_years_en', 'attached',
+								'nationality_en','language1_name','language1_proficiency_en'];
   var FACETS_LABELS = {
     category_en: 'Category',
     'location_en': 'Location',
@@ -26,7 +30,10 @@ $(document).ready(function () {
     suggested_salary: 'Suggested Salary',
     updated_date: "Last Modified",
     exp_years_en: 'Years of Experience',
-    attached: 'Resume Type'
+    attached: 'Resume Type',
+	nationality_en: 'Nationality',
+	language1_name: 'Language',
+	language1_proficiency_en: 'Language Proficiency'
   };
 
   var sliders = {};
