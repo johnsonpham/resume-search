@@ -105,7 +105,7 @@ $(document).ready(function () {
 
   function renderStats(content) {
     var stats = {
-      nbHits: content.nbHits,
+      nbHits: accounting.formatNumber(content.nbHits),
       nbHits_plural: content.nbHits !== 1,
       processingTimeMS: content.processingTimeMS
     };
@@ -118,6 +118,7 @@ $(document).ready(function () {
         content.hits[i].companyLogo = 'http://www.php.company/img/placeholder-logo.png';
       }
       item.updated_date_label = moment.unix(item.updated_date).format("DD/MM/YYYY");
+      item.suggested_salary_label = accounting.formatNumber(item.suggested_salary);
     });
 
     $hits.html(hitTemplate.render(content));
@@ -153,6 +154,9 @@ $(document).ready(function () {
           values: content.getFacetValues(facetName, {sortBy: ['isRefined:desc', 'count:desc']}),
           disjunctive: $.inArray(facetName, PARAMS.disjunctiveFacets) !== -1
         };
+        facetContent.values.forEach(function (v) {
+          v.countLabel = accounting.formatNumber(v.count);
+        });
         if (facetContent.facet == "attached") {//custom code
           facetContent.values.forEach(function (v) {
             (v.name == "false") && (v.label = "Online");
@@ -186,8 +190,6 @@ $(document).ready(function () {
         }
         facetsHtml += facetTemplate.render(facetContent);
       }
-      // console.log(facetContent);
-      // facetsHtml += facetTemplate.render(facetContent);
     }
     $facets.html(facetsHtml);
   }
