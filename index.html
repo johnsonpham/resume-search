@@ -121,7 +121,7 @@
       </div>
       <div class="col-sm-2 extra-info text-center">
         <strong data-toggle="tooltip" title="Year of experience">{{{ exp_years_en }}}</strong>
-        {{#suggested_salary}} <br>${{{ suggested_salary }}} {{/suggested_salary}}
+        {{#suggested_salary_label}} <br>${{{ suggested_salary_label }}} {{/suggested_salary_label}}
       </div>
       <div class="col-sm-1 text-center">
         <div data-toggle="tooltip" title="CV completion">
@@ -189,7 +189,11 @@
         <a href="" class="facet-link toggle-refine {{#disjunctive}}facet-disjunctive{{/disjunctive}} {{#isRefined}}facet-refined{{/isRefined}}" data-facet="{{ facet }}" data-value="{{ name }}">
           {{#label}} {{ label }} {{/label}}
           {{^label}} {{ name }} {{/label}}
-          <span class="facet-count">{{ count }}</span>
+
+          <span class="facet-count">
+            {{#countLabel}} {{ countLabel }} {{/countLabel}}
+            {{^countLabel}} {{ count }} {{/countLabel}}
+          </span>
         </a>
       </li>
       {{/values}}

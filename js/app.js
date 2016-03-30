@@ -111,13 +111,13 @@ $(document).ready(function () {
         content.hits[i].companyLogo = 'http://www.php.company/img/placeholder-logo.png';
       }
       item.updated_date_label = moment.unix(item.updated_date).format("DD/MM/YYYY");
+      item.suggested_salary_label = accounting.formatNumber(item.suggested_salary);
     });
 
     $hits.html(hitTemplate.render(content));
   }
 
   function renderFacets(content, state) {
-    console.log(content.disjunctiveFacets);
     var facetsHtml = '';
     for (var facetIndex = 0; facetIndex < FACETS_ORDER_OF_DISPLAY.length; ++facetIndex) {
       var facetName = FACETS_ORDER_OF_DISPLAY[facetIndex];
@@ -147,6 +147,9 @@ $(document).ready(function () {
           values: content.getFacetValues(facetName, {sortBy: ['isRefined:desc', 'count:desc']}),
           disjunctive: $.inArray(facetName, PARAMS.disjunctiveFacets) !== -1
         };
+        facetContent.values.forEach(function (v) {
+          v.countLabel = accounting.formatNumber(v.count);
+        });
         if (facetContent.facet == "attached") {//custom code
           facetContent.values.forEach(function (v) {
             (v.name == "false") && (v.label = "Online");
@@ -180,8 +183,6 @@ $(document).ready(function () {
         }
         facetsHtml += facetTemplate.render(facetContent);
       }
-      // console.log(facetContent);
-      // facetsHtml += facetTemplate.render(facetContent);
     }
     $facets.html(facetsHtml);
   }
