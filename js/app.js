@@ -98,7 +98,7 @@ $(document).ready(function () {
 
   function renderStats(content) {
     var stats = {
-      nbHits: content.nbHits,
+      nbHits: accounting.formatNumber(content.nbHits),
       nbHits_plural: content.nbHits !== 1,
       processingTimeMS: content.processingTimeMS
     };
@@ -117,6 +117,7 @@ $(document).ready(function () {
   }
 
   function renderFacets(content, state) {
+    console.log(content.disjunctiveFacets);
     var facetsHtml = '';
     for (var facetIndex = 0; facetIndex < FACETS_ORDER_OF_DISPLAY.length; ++facetIndex) {
       var facetName = FACETS_ORDER_OF_DISPLAY[facetIndex];
