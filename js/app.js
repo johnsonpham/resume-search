@@ -8,7 +8,7 @@ $(document).ready(function () {
   // Replace with your own values
   var APPLICATION_ID = 'G9K82IDUDX';
   var SEARCH_ONLY_API_KEY = '876286a34d35bf9c8b4a8d1398c22a6a';
-  var INDEX_NAME = 'resumes_slave01';
+  var INDEX_NAME = 'resumes';
   var PARAMS = {
     hitsPerPage: 20,
     maxValuesPerFacet: 5,
@@ -98,7 +98,7 @@ $(document).ready(function () {
 
   function renderStats(content) {
     var stats = {
-      nbHits: content.nbHits,
+      nbHits: accounting.formatNumber(content.nbHits),
       nbHits_plural: content.nbHits !== 1,
       processingTimeMS: content.processingTimeMS
     };
@@ -117,6 +117,7 @@ $(document).ready(function () {
   }
 
   function renderFacets(content, state) {
+    console.log(content.disjunctiveFacets);
     var facetsHtml = '';
     for (var facetIndex = 0; facetIndex < FACETS_ORDER_OF_DISPLAY.length; ++facetIndex) {
       var facetName = FACETS_ORDER_OF_DISPLAY[facetIndex];
@@ -424,5 +425,10 @@ $(document).ready(function () {
     $searchInputIcon.toggleClass('empty', query.trim() !== '');
   }
 
+/// TOOLTIP
+  function tooltip(){
+    $('[data-toggle="tooltip"]').tooltip({html:true});
+  };
+  setTimeout(tooltip, 1000);
 
 });
