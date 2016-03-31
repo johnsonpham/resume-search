@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="css/styles.css">
   <!-- /CSS -->
+
 </head>
 <body>
 
@@ -96,9 +97,13 @@
           <a target='_blank'  href="http://employer.staging.vietnamworks.com/v2/resume/detail/{{{objectID}}}">{{{fullname}}}</a>
         </h3>
         <h4>{{{ _highlightResult.most_recent_position.value }}}</h4>
+        {{#highLight}}...{{{highLight.value}}}...{{/highLight}}
       </div>
       <div class="col-sm-6">
         <div class="row">
+          <div>
+
+          </div>
           <div class="col-sm-6 text-clip">
             <i data-toggle="tooltip" title="" data-container=".search-results" class="fa fa-fw fa-folder-open" data-original-title="Industry"></i>
             {{{ _highlightResult.category_en.value }}}
@@ -239,6 +244,7 @@
 
 
 <!-- Javascript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.6.1/lodash.min.js"></script>
 <script src="http://cdn.jsdelivr.net/jquery/2.1.4/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <script src="http://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.js"></script>
