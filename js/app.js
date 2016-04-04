@@ -197,6 +197,8 @@ $(document).ready(function () {
           });
           facetContent.values = facetContent.values.sort(function (a, b) {return a.weight - b.weight;});
         }
+
+        _.chain(facetContent.values)
         facetsHtml += facetTemplate.render(facetContent);
       }
     }

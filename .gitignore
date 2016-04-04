@@ -1,5 +1,6 @@
 .idea
 vendor/
+src/config.php
 *.iml
 *.lock
 node_modules/
