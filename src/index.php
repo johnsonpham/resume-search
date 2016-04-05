@@ -81,7 +81,7 @@ function extractJobLevel($conn, &$item, $jobLevelId, $fieldName)
   }
   //$jobLevelsOrder = array("GRADUATE", "GRADUATE", "EXPERIENCED", "MANAGER");
   $item["credit_job_level"] = ($jobLevelId <= 1) ? "GRADUATE" :
-    (in_array($jobLevelId, array(5,6)) ? "EXPERIENCED" : "MANAGER");
+    (in_array($jobLevelId, array(5, 6)) ? "EXPERIENCED" : "MANAGER");
   $item["credit_job_level"] = strtoupper("JOBLEVEL_" . $item["credit_job_level"]);
 }
 
@@ -148,7 +148,12 @@ function extractFromMainResumeTbl($conn, &$item)
     extractLanguage($conn, $item);
     extractLanguageProficiency($conn, $item);
 
-    $item["credit_language"] = strtoupper($item["language1_name"] . "_" . $item["language1_proficiency_en"]);
+    if (isset($item["language1_name"]) && isset($item["language1_proficiency_en"])) {
+      $item["credit_language"] = strtoupper($item["language1_name"] . "_" . $item["language1_proficiency_en"]);
+    }
+    else {
+      $item["credit_language"] = "";
+    }
   }
 }
 
