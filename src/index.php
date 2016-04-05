@@ -104,10 +104,10 @@ function extractLanguage($conn, &$item)
   $sql = "Select languageproficiencyname from tblref_languageproficiency where languageproficiencyid = $langId";
   printSQL($sql);
   $result = $conn->query($sql);
-  //echo $result;
+
+  $item["language1_name"] = "";
   while ($row = $result->fetch_assoc()) {
     $item["language1_name"] = $row["languageproficiencyname"];
-//    $item["lang_credit"] = strtolower($item["language1_name"]) == "japanese" ? "": "";
   }
 }
 
@@ -118,6 +118,7 @@ function extractLanguageProficiency($conn, &$item)
   $sql = "Select languagelevelname, languageid from tblref_languagelevel where languagelevelid = $proficiencyId";
   printSQL($sql);
   $result = $conn->query($sql);
+  $item["language1_proficiency_en"] = "";
   while ($row = $result->fetch_assoc()) {
     if ($row['languageid'] == 1) {
       $item["language1_proficiency_vi"] = $row["languagelevelname"];
@@ -317,6 +318,7 @@ while (true) {
           $index->saveObjects($batch);
         } catch (Exception $e) {
           $totalFailedRecords += ITEMS_PER_BATCH;
+          var_dump($e);
           echo 'Caught exception: ', $e->getMessage(), "\n";
         }
         $batch = array();
