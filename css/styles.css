@@ -193,7 +193,8 @@ header .logo img {
 
 .hit-content em {
 	font-style: normal;
-	background: #fbdde0;
+	background: #ffe0bf;
+	font-weight: 500;
 }
 .hit-content .hit-description {
 	color: #999;

@@ -13,15 +13,11 @@ $(document).ready(function () {
     hitsPerPage: 20,
     maxValuesPerFacet: 5,
     facets: ['type'],
-    disjunctiveFacets: ['category_en', 'location_en', 'job_level_en', 'most_recent_employer', 
-						'suggested_salary', "updated_date",'exp_years_en', 'attached',
-						'nationality_en','language1_name','language1_proficiency_en'],
+    disjunctiveFacets: ['category_en', 'location_en', 'job_level_en', 'most_recent_employer', 'suggested_salary', "updated_date", 'exp_years_en', 'attached'],
     // numericFilters: 'updated_date>=1422359939'
   };
   var FACETS_SLIDER = ["suggested_salary", "updated_date"];
-  var FACETS_ORDER_OF_DISPLAY = ['category_en', 'location_en', 'job_level_en', 'most_recent_employer', 'suggested_salary', 
-								'updated_date','exp_years_en', 'attached',
-								'nationality_en','language1_name','language1_proficiency_en'];
+  var FACETS_ORDER_OF_DISPLAY = ['category_en', 'location_en', 'job_level_en', 'most_recent_employer', 'suggested_salary', "updated_date", 'exp_years_en', 'attached'];
   var FACETS_LABELS = {
     category_en: 'Category',
     'location_en': 'Location',
@@ -30,10 +26,7 @@ $(document).ready(function () {
     suggested_salary: 'Suggested Salary',
     updated_date: "Last Modified",
     exp_years_en: 'Years of Experience',
-    attached: 'Resume Type',
-	nationality_en: 'Nationality',
-	language1_name: 'Language',
-	language1_proficiency_en: 'Language Proficiency'
+    attached: 'Resume Type'
   };
 
   var sliders = {};
@@ -113,12 +106,28 @@ $(document).ready(function () {
   }
 
   function renderHits(content) {
+    var fields = ["most_recent_position", "exp_jobtitle", "desired_job_title", "resume_title", "content"];
     $.each(content.hits, function (i, item) {
       if (!content.hits[i].companyLogo || content.hits[i].companyLogo.length <= 0) {
         content.hits[i].companyLogo = 'http://www.php.company/img/placeholder-logo.png';
       }
       item.updated_date_label = moment.unix(item.updated_date).format("DD/MM/YYYY");
       item.suggested_salary_label = accounting.formatNumber(item.suggested_salary);
+      var fi = -1;
+      item.highLight = _.chain(item._highlightResult)
+        .pickBy(function (o) {return o.matchedWords.length > 0;})
+        .at(fields)
+        .find(function (o, index) {
+          fi = index;
+          return o !== undefined;
+        })
+        .value();
+      item.highLight = item._snippetResult[fields[fi]];
+      item.highLight.field = fields[fi];
+      if (item.highLight.field == "most_recent_position") {
+        delete item.highLight;
+      }
+      // console.log(item.highLight);
     });
 
     $hits.html(hitTemplate.render(content));
@@ -188,6 +197,8 @@ $(document).ready(function () {
           });
           facetContent.values = facetContent.values.sort(function (a, b) {return a.weight - b.weight;});
         }
+
+        _.chain(facetContent.values)
         facetsHtml += facetTemplate.render(facetContent);
       }
     }
@@ -434,8 +445,8 @@ $(document).ready(function () {
   }
 
 /// TOOLTIP
-  function tooltip(){
-    $('[data-toggle="tooltip"]').tooltip({html:true});
+  function tooltip() {
+    $('[data-toggle="tooltip"]').tooltip({html: true});
   };
   setTimeout(tooltip, 1000);
 
