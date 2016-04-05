@@ -1,5 +1,16 @@
-$(document).ready(function () {
+function getUrlVars() {
+  var vars = {};
+  var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+    vars[key] = value;
+  });
+  return vars;
+}
 
+
+var disablePlus = getUrlVars()["disable-plus"] || false;
+console.log(disablePlus);
+
+$(document).ready(function () {
 
 
   // INITIALIZATION
@@ -171,8 +182,14 @@ $(document).ready(function () {
           disjunctive: $.inArray(facetName, PARAMS.disjunctiveFacets) !== -1
         };
         facetContent.values.forEach(function (v) {
-          var count = v.count - (v.count % 100);
-          v.countLabel = accounting.formatNumber(count) + "+";
+          var mod = v.count % 100;
+          var count = v.count - (mod);
+          if (count <= 0) {
+            count = v.count;
+          }
+
+          v.countLabel = disablePlus == "true" ? accounting.formatNumber(v.count) :
+            (accounting.formatNumber(count) + (count >= 100 ? "+" : ""));
         });
         if (facetContent.facet == "attached") {//custom code
           facetContent.values.forEach(function (v) {
