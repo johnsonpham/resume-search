@@ -10,11 +10,16 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
+$page = 1;
+$totalFailedRecords = 0;
+$client = new \AlgoliaSearch\Client("G9K82IDUDX", "876286a34d35bf9c8b4a8d1398c22a6a");
+$index = $client->initIndex('resumes');
+
 function printSQL($sql)
 {
-	if (PRINT_SQL) {
-		echo "\n$sql;\n";
-	}
+  if (PRINT_SQL) {
+    echo "\n$sql;\n";
+  }
 }
 
 function extractLocation($conn, &$item)
@@ -74,9 +79,14 @@ function extractJobLevel($conn, &$item, $jobLevelId, $fieldName)
       $item[$fieldNameEn] = $jobLevel['joblevelname'];
     }
   }
+  //$jobLevelsOrder = array("GRADUATE", "GRADUATE", "EXPERIENCED", "MANAGER");
+  $item["credit_job_level"] = ($jobLevelId <= 1) ? "GRADUATE" :
+    (in_array($jobLevelId, array(5,6)) ? "EXPERIENCED" : "MANAGER");
+  $item["credit_job_level"] = strtoupper("JOBLEVEL_" . $item["credit_job_level"]);
 }
 
-function extractAttached($conn, &$item) {
+function extractAttached($conn, &$item)
+{
   $resumeid = $item["resumeid"];
   if ($resumeid == null) return;
   $sql = "SELECT isAttached FROM tblresume WHERE resumeid = $resumeid";
@@ -87,7 +97,8 @@ function extractAttached($conn, &$item) {
   }
 }
 
-function extractLanguage($conn, &$item) {
+function extractLanguage($conn, &$item)
+{
   $langId = $item["language1"];
   if ($langId == null) return;
   $sql = "Select languageproficiencyname from tblref_languageproficiency where languageproficiencyid = $langId";
@@ -96,10 +107,12 @@ function extractLanguage($conn, &$item) {
   //echo $result;
   while ($row = $result->fetch_assoc()) {
     $item["language1_name"] = $row["languageproficiencyname"];
+//    $item["lang_credit"] = strtolower($item["language1_name"]) == "japanese" ? "": "";
   }
 }
 
-function extractLanguageProficiency($conn, &$item) {
+function extractLanguageProficiency($conn, &$item)
+{
   $proficiencyId = $item["languagelevel1"];
   if ($proficiencyId == null) return;
   $sql = "Select languagelevelname, languageid from tblref_languagelevel where languagelevelid = $proficiencyId";
@@ -115,7 +128,8 @@ function extractLanguageProficiency($conn, &$item) {
   }
 }
 
-function extractFromMainResumeTbl($conn, &$item) {
+function extractFromMainResumeTbl($conn, &$item)
+{
   $resumeid = $item["resumeid"];
   if ($resumeid == null) return;
 
@@ -126,16 +140,19 @@ function extractFromMainResumeTbl($conn, &$item) {
   $result = $conn->query($sql);
   while ($row = $result->fetch_assoc()) {
     $item["attached"] = $row["isAttached"] == 1 ? true : false;
-	$item["language1"]= $row["language1"];
-	$item["languagelevel1"]= $row["languagelevel1"];
-	
-	// Language proficiency: flat now and only the 1st(will nested and multi later)
-	extractLanguage($conn, $item);
+    $item["language1"] = $row["language1"];
+    $item["languagelevel1"] = $row["languagelevel1"];
+
+    // Language proficiency: flat now and only the 1st(will nested and multi later)
+    extractLanguage($conn, $item);
     extractLanguageProficiency($conn, $item);
+
+    $item["credit_language"] = strtoupper($item["language1_name"] . "_" . $item["language1_proficiency_en"]);
   }
 }
 
-function extractTotal($conn, &$item) {
+function extractTotal($conn, &$item)
+{
   $resumeid = $item["resumeid"];
   if ($resumeid == null) return;
 
@@ -153,12 +170,13 @@ function extractTotal($conn, &$item) {
   $item["total_views"] = 0;
   $item["total_downloads"] = 0;
   while ($row = $result->fetch_assoc()) {
-    $item["total_views"] = (int) + $row["totalViews"];
-    $item["total_downloads"] = (int) + $row["totalDownloads"];
+    $item["total_views"] = (int)+$row["totalViews"];
+    $item["total_downloads"] = (int)+$row["totalDownloads"];
   }
 }
 
-function extractCompletionRate($conn, &$item) {
+function extractCompletionRate($conn, &$item)
+{
   $resumeid = $item["resumeid"];
   if ($resumeid == null) return;
 
@@ -167,11 +185,12 @@ function extractCompletionRate($conn, &$item) {
   $result = $conn->query($sql);
   $item["completion_rate"] = 0;
   while ($row = $result->fetch_assoc()) {
-    $item["completion_rate"] = (int) + $row["completionRate"];
+    $item["completion_rate"] = (int)+$row["completionRate"];
   }
 }
 
-function extractYearExperienceResume($conn, &$item) {
+function extractYearExperienceResume($conn, &$item)
+{
   $yearid = $item["yearsexperienceid"];
   if ($yearid == null) return;
 
@@ -190,70 +209,53 @@ function extractYearExperienceResume($conn, &$item) {
 }
 
 
+function extractNationality($conn, &$item)
+{
+  try {
+    $nationalityid = $item["nationalityid"];
+    if ($nationalityid == null) return;
+    $sql = "select * from tblref_nationality where nationalityid = $nationalityid";
+    printSQL($sql);
 
-function extractNationality($conn, &$item) {
-	try {
-	  $nationalityid = $item["nationalityid"];
-	  if ($nationalityid == null) return;
-	  $sql = "select * from tblref_nationality where nationalityid = $nationalityid";
-	  printSQL($sql);
-	  
-	  $result = $conn->query($sql);
-	  while ($row = $result->fetch_assoc()) {
-		if ($row['languageid'] == 1) {
-		  $item["nationality_vi"] = $row['nationalityname'];
-		}
-		else {
-		  $item["nationality_en"] = $row['nationalityname'];
-		}
-	  }
-	  unset($item['nationalityid']);
-	  } catch (Exception $e) {
-			  $totalFailedRecords += ITEMS_PER_BATCH;
-			  echo 'Caught exception: ',  $e->getMessage(), "\n";
+    $result = $conn->query($sql);
+    while ($row = $result->fetch_assoc()) {
+      if ($row['languageid'] == 1) {
+        $item["nationality_vi"] = $row['nationalityname'];
       }
-  
+      else {
+        $item["nationality_en"] = $row['nationalityname'];
+      }
+    }
+    unset($item['nationalityid']);
+  } catch (Exception $e) {
+//    $totalFailedRecords += ITEMS_PER_BATCH;
+    echo 'Caught exception: ', $e->getMessage(), "\n";
+  }
+
 }
 
-function extractCredits($conn, &$item) {
-	// By job level
-	$creditsJL=1;
-	$jobLevelId=(int) $item['joblevel'];
-	switch ($jobLevelId) {
-    case 0:
-	case 1:
-        $creditsJL = RS_MULTICREDIT_JOBLEVEL_GRADUATE;
-        break;	
-    case 5:
-	case 6:
-        $creditsJL = RS_MULTICREDIT_JOBLEVEL_EXPERIENCED;
-        break;
-	case 7:
-	case 10:
-	case 3:
-	case 4:
-	case 8:
-	case 9:
-        $creditsJL = RS_MULTICREDIT_JOBLEVEL_EXPERIENCED;
-        break;
-	}
-	// By Language
-	$creditsLang=1;
-	$languageId = (int) $item['language1'];
-	switch ($jobLevelId) {
-    case 22:
-        $creditsLang = RS_MULTICREDIT_JAPANESE;
-        break;
-	}
-	
-	// Final
-	$credits = max($creditsJL, $creditsLang);
-	$item['credits'] = $credits;
-	//echo "credits: $jobLevelId ->$creditsJL ,  $languageId -> $creditsLang  --> $credits";
+function extractCredits($conn, &$item)
+{
+  $sql = "select * from tblsys_parameter where parcode = 'RS_MULTICREDIT_" . $item["credit_job_level"] . "'";
+  $result = $conn->query($sql);
+  if ($row = $result->fetch_assoc()) {
+    $item["credit"] = $row["parvalue"];
+  }
+
+  if (!isset($item["credit"])) {
+    $item["credit"] = 0;
+  }
+
+  $sql = "select * from tblsys_parameter where parcode = 'RS_MULTICREDIT_" . $item["credit_language"] . "'";
+  $result = $conn->query($sql);
+  if ($row = $result->fetch_assoc()) {
+    $item["credit"] = max($row["parvalue"], $item["credit"]);
+  }
+
+  unset($item["credit_job_level"]);
+  unset($item["credit_language"]);
 }
 
-$page = 1;
-$totalFailedRecords = 0;
 while (true) {
   $offset = ($page - 1) * ITEMS_PER_BATCH;
   $sql = "Select resumeid, fullname, category, content, desiredjobtitle as desired_job_title, desiredjoblevelid, 
@@ -261,7 +263,7 @@ while (true) {
     edu_major, lastdateupdated as updated_date, joblevel, mostrecentemployer as most_recent_employer, 
     suggestedsalary as suggested_salary, exp_jobtitle, mostrecentposition as most_recent_position, 
     yearsexperienceid, genderid, nationalityid, birthday
-    From tblresume_search_all limit $offset, ".ITEMS_PER_BATCH;
+    From tblresume_search_all limit $offset, " . ITEMS_PER_BATCH;
   printSQL($sql);
   $result = $conn->query($sql);
 
@@ -270,9 +272,9 @@ while (true) {
 
     while ($row = $result->fetch_assoc()) {
       $item = $row;
-      $item["suggested_salary"] = (int) + $item["suggested_salary"];
+      $item["suggested_salary"] = (int)+$item["suggested_salary"];
       $item["updated_date"] = strtotime($item["updated_date"]);
-      $item["birthday"] = (int) + substr($item["birthday"], 0, 4);
+      $item["birthday"] = (int)+substr($item["birthday"], 0, 4);
 
       $item['gender'] = "female";
       if ($item['genderid'] == 1) {
@@ -285,10 +287,8 @@ while (true) {
       extractIndustry($conn, $item);
 
       extractJobLevel($conn, $item, $item["joblevel"], "job_level");
-      //unset($item['joblevel']);
 
       extractJobLevel($conn, $item, $item["desiredjoblevelid"], "desired_job_level");
-      //unset($item['desiredjoblevelid']);
 
       extractAttached($conn, $item);
 
@@ -301,16 +301,12 @@ while (true) {
       extractNationality($conn, $item);
 
       extractFromMainResumeTbl($conn, $item);
-	  
-	  extractCredits($conn, $item);
-		echo "credits: ". $item['credits']."\n";
+
+      extractCredits($conn, $item);
 
       $data[] = $item;
     }
 
-
-    $client = new \AlgoliaSearch\Client("G9K82IDUDX", "876286a34d35bf9c8b4a8d1398c22a6a");
-    $index = $client->initIndex('resumes');
 
     $batch = array();
     foreach ($data as $row) {
@@ -321,7 +317,7 @@ while (true) {
           $index->saveObjects($batch);
         } catch (Exception $e) {
           $totalFailedRecords += ITEMS_PER_BATCH;
-          echo 'Caught exception: ',  $e->getMessage(), "\n";
+          echo 'Caught exception: ', $e->getMessage(), "\n";
         }
         $batch = array();
       }
