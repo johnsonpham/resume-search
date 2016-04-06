@@ -318,23 +318,21 @@ while (true) {
     foreach ($data as $row) {
       $row['objectID'] = $row['resumeid'];
       array_push($batch, $row);
-      while (true) {
-        if (count($batch) == ITEMS_PER_BATCH) {
+      if (count($batch) == ITEMS_PER_BATCH) {
+        while (count($batch) > 0) {
           try {
             $index->saveObjects($batch);
             $batch = array();
-          }
-          catch (Exception $e) {
-            $totalFailedRecords += ITEMS_PER_BATCH;
+          } catch (Exception $e) {
+            $totalFailedRecords += 1;
             echo 'Caught exception: ', $e->getMessage(), "\n";
             echo 'try again without: ', $e["objectID"], "\n";
-            $batch = array_filter($batch, function ($it) use ($e)  {
+            $batch = array_filter($batch, function ($it) use ($e) {
               return $it["objectID"] == $e["objectID"];
             });
             continue;
           }
         }
-        break;
       }
     }
 
