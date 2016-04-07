@@ -264,10 +264,11 @@ function extractCredits($conn, &$item)
 
 while (true) {
   $offset = ($page - 1) * ITEMS_PER_BATCH;
-  $sql = "Select resumeid, fullname, category, content, desiredjobtitle as desired_job_title, desiredjoblevelid, 
+  $sql = "Select resumeid, fullname, category, desiredjobtitle as desired_job_title, desiredjoblevelid, 
     education, skill, resumetitle as resume_title, exp_description, 
     edu_major, lastdateupdated as updated_date, joblevel, mostrecentemployer as most_recent_employer, 
     suggestedsalary as suggested_salary, exp_jobtitle, mostrecentposition as most_recent_position, 
+    workexperience as work_experience, edu_description,
     yearsexperienceid, genderid, nationalityid, birthday
     From tblresume_search_all limit $offset, " . ITEMS_PER_BATCH;
   printSQL($sql);
