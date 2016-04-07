@@ -319,14 +319,20 @@ while (true) {
       $row['objectID'] = $row['resumeid'];
       array_push($batch, $row);
       if (count($batch) == ITEMS_PER_BATCH) {
-        try {
-          $index->saveObjects($batch);
-        } catch (Exception $e) {
-          $totalFailedRecords += ITEMS_PER_BATCH;
-          var_dump($e);
-          echo 'Caught exception: ', $e->getMessage(), "\n";
+        while (count($batch) > 0) {
+          try {
+            $index->saveObjects($batch);
+            $batch = array();
+          } catch (Exception $e) {
+            $totalFailedRecords += 1;
+            echo 'Caught exception: ', $e->getMessage(), "\n";
+            echo 'try again without: ', $e["objectID"], "\n";
+            $batch = array_filter($batch, function ($it) use ($e) {
+              return $it["objectID"] == $e["objectID"];
+            });
+            continue;
+          }
         }
-        $batch = array();
       }
     }
 
