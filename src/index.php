@@ -280,7 +280,7 @@ while (true) {
     suggestedsalary as suggested_salary, exp_jobtitle, mostrecentposition as most_recent_position, 
     workexperience as work_experience, edu_description,
     yearsexperienceid, genderid, nationalityid, birthday
-    From tblresume_search_all limit $offset, " . ITEMS_PER_BATCH;
+    From tblresume_search_all ORDER BY resumeid DESC limit $offset, " . ITEMS_PER_BATCH;
   printSQL($sql);
   $result = $conn->query($sql);
 
