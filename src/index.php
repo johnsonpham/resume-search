@@ -162,23 +162,33 @@ function extractTotal($conn, &$item)
   $resumeid = $item["resumeid"];
   if ($resumeid == null) return;
 
-  $sql = "SELECT SUM(views) totalViews, SUM(downloads) totalDownloads
-          FROM (
-            SELECT resumeid resumeId, 0 AS views, 1 AS downloads FROM tblresume_download_tracking WHERE resumeid = $resumeid 
-            UNION ALL
-            SELECT resume_id resumeId, 0 AS views, 1 AS downloads FROM track_resume_download WHERE resume_id = $resumeid
-            UNION ALL
-            SELECT resume_id resumeId, noofviewed AS views,0 AS downloads FROM track_resume_view WHERE resume_id = $resumeid
-          ) f
-          GROUP BY resumeId";
-  printSQL($sql);
-  $result = $conn->query($sql);
-  $item["total_views"] = 0;
+//  $sql = "SELECT SUM(views) totalViews, SUM(downloads) totalDownloads
+//          FROM (
+//            SELECT resumeid resumeId, 0 AS views, 1 AS downloads FROM tblresume_download_tracking WHERE resumeid = $resumeid
+//            UNION ALL
+//            SELECT resume_id resumeId, 0 AS views, 1 AS downloads FROM track_resume_download WHERE resume_id = $resumeid
+//            UNION ALL
+//            SELECT resume_id resumeId, noofviewed AS views,0 AS downloads FROM track_resume_view WHERE resume_id = $resumeid
+//          ) f
+//          GROUP BY resumeId";
   $item["total_downloads"] = 0;
-  while ($row = $result->fetch_assoc()) {
-    $item["total_views"] = (int)+$row["totalViews"];
+  $sql = "SELECT count(*) as totalDownloads FROM track_resume_download t WHERE resume_id = $resumeid";
+  $result = $conn->query($sql);
+  if ($row = $result->fetch_assoc()) {
     $item["total_downloads"] = (int)+$row["totalDownloads"];
   }
+
+  $item["total_views"] = 0;
+  $sql = "SELECT count(*) as totalViews FROM track_resume_view t WHERE resume_id = $resumeid";
+  $result = $conn->query($sql);
+  if ($row = $result->fetch_assoc()) {
+    $item["total_views"] = (int)+$row["totalViews"];
+  }
+
+//  while ($row = $result->fetch_assoc()) {
+//    $item["total_views"] = (int)+$row["totalViews"];
+//    $item["total_downloads"] = (int)+$row["totalDownloads"];
+//  }
 }
 
 function extractCompletionRate($conn, &$item)
