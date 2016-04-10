@@ -16,10 +16,6 @@ $(document).ready(function () {
   // INITIALIZATION
   // ==============
 
-  // Replace with your own values
-  var APPLICATION_ID = 'G9K82IDUDX';
-  var SEARCH_ONLY_API_KEY = '876286a34d35bf9c8b4a8d1398c22a6a';
-  var INDEX_NAME = 'resumes';
   var PARAMS = {
     hitsPerPage: 20,
     maxValuesPerFacet: 5,
@@ -124,7 +120,7 @@ $(document).ready(function () {
   }
 
   function renderHits(content) {
-    var fields = ["most_recent_position", "exp_jobtitle", "desired_job_title", "resume_title", "content"];
+    var fields = ["most_recent_position", "exp_jobtitle", "desired_job_title"];
     $.each(content.hits, function (i, item) {
       if (!content.hits[i].companyLogo || content.hits[i].companyLogo.length <= 0) {
         content.hits[i].companyLogo = 'http://www.php.company/img/placeholder-logo.png';

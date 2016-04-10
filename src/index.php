@@ -1,8 +1,8 @@
 <?php
 require __DIR__ . '/../vendor/autoload.php';
-require __DIR__ . '/config.php';
+require __DIR__ . '/../conf/config.php';
 
-
+echo "START " . date("Y/m/d H:i:s")."\n";
 // Create connection
 $conn = new mysqli(SERVER_NAME, USERNAME, PASSWORD, DB_NAME);
 // Check connection
@@ -12,8 +12,8 @@ if ($conn->connect_error) {
 
 $page = 1;
 $totalFailedRecords = 0;
-$client = new \AlgoliaSearch\Client("G9K82IDUDX", "876286a34d35bf9c8b4a8d1398c22a6a");
-$index = $client->initIndex('resumes');
+$client = new \AlgoliaSearch\Client(ALGOLIA_APP_ID, ALGOLIA_APP_KEY);
+$index = $client->initIndex(ALGOLIA_INDEX);
 
 function printSQL($sql)
 {
@@ -172,10 +172,15 @@ function extractTotal($conn, &$item)
 //          ) f
 //          GROUP BY resumeId";
   $item["total_downloads"] = 0;
-  $sql = "SELECT count(*) as totalDownloads FROM track_resume_download t WHERE resume_id = $resumeid";
+  $sql = "SELECT count(*) as totalDownloads FROM tblresume_download_tracking t WHERE resumeid = $resumeid";
   $result = $conn->query($sql);
   if ($row = $result->fetch_assoc()) {
     $item["total_downloads"] = (int)+$row["totalDownloads"];
+  }
+  $sql = "SELECT count(*) as totalDownloads FROM track_resume_download t WHERE resume_id = $resumeid";
+  $result = $conn->query($sql);
+  if ($row = $result->fetch_assoc()) {
+    $item["total_downloads"] = $item["total_downloads"]+(int)+$row["totalDownloads"];
   }
 
   $item["total_views"] = 0;
@@ -255,17 +260,17 @@ function extractCredits($conn, &$item)
   $sql = "select * from tblsys_parameter where parcode = 'RS_MULTICREDIT_" . $item["credit_job_level"] . "'";
   $result = $conn->query($sql);
   if ($row = $result->fetch_assoc()) {
-    $item["credit"] = $row["parvalue"];
+    $item["credits"] = $row["parvalue"];
   }
 
-  if (!isset($item["credit"])) {
-    $item["credit"] = 0;
+  if (!isset($item["credits"])) {
+    $item["credits"] = 0;
   }
 
   $sql = "select * from tblsys_parameter where parcode = 'RS_MULTICREDIT_" . $item["credit_language"] . "'";
   $result = $conn->query($sql);
   if ($row = $result->fetch_assoc()) {
-    $item["credit"] = max($row["parvalue"], $item["credit"]);
+    $item["credits"] = max($row["parvalue"], $item["credits"]);
   }
 
   unset($item["credit_job_level"]);
@@ -273,6 +278,8 @@ function extractCredits($conn, &$item)
 }
 
 while (true) {
+	echo "Page $page start " . date("Y/m/d H:i:s")."\n";
+
   $offset = ($page - 1) * ITEMS_PER_BATCH;
   $sql = "Select resumeid, fullname, category, desiredjobtitle as desired_job_title, desiredjoblevelid, 
     education, skill, resumetitle as resume_title, exp_description, 
@@ -280,7 +287,7 @@ while (true) {
     suggestedsalary as suggested_salary, exp_jobtitle, mostrecentposition as most_recent_position, 
     workexperience as work_experience, edu_description,
     yearsexperienceid, genderid, nationalityid, birthday
-    From tblresume_search_all limit $offset, " . ITEMS_PER_BATCH;
+    From tblresume_search_all ORDER BY resumeid DESC limit $offset, " . ITEMS_PER_BATCH;
   printSQL($sql);
   $result = $conn->query($sql);
 
@@ -361,3 +368,4 @@ while (true) {
 }
 
 $conn->close();
+echo "END " . date("Y/m/d H:i:s")."\n";
