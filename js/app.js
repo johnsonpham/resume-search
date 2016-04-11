@@ -126,7 +126,12 @@ $(document).ready(function () {
         content.hits[i].companyLogo = 'http://www.php.company/img/placeholder-logo.png';
       }
       item.updated_date_label = moment.unix(item.updated_date).format("DD/MM/YYYY");
-      item.suggested_salary_label = accounting.formatNumber(item.suggested_salary);
+      if(item.suggested_salary > 0){
+        item.suggested_salary_label = '$' + accounting.formatNumber(item.suggested_salary);
+      }else{
+        item.suggested_salary_label = 'Negotiable';
+      }
+
       var fi = -1;
       item.highLight = _.chain(item._highlightResult)
         .pickBy(function (o) {return o.matchedWords.length > 0;})
