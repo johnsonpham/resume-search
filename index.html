@@ -6,10 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
   <meta name="author" content="">
   <link rel="shortcut icon" href="http://advice.vietnamworks.com/misc/favicon.ico" type="image/x-icon"/>
-  <title>Jobs, find jobs, job search, executive and manager jobs - VietnamWorks</title>
+  <title>VietnamWorks - Top employment and recruitment website in Vietnam.</title>
   <meta name="Robots" content="index, follow">
-  <meta name="Description" content="Top job search, find jobs and career website in Vietnam. Find jobs and post resume to apply new jobs. Search jobs from 4,000+ new jobs updated daily.">
-  <meta name="Keywords" content="vietnamworks, vietnamworks.com, jobs, search jobs, find jobs, vietnam job, recruitment, employment, career, executive jobs, job opportunities, job seeker, finding job, job site, online jobs, top jobs">
+  <meta name="Description" content="VietnamWorks  - Employment in Vietnam, Vietnam Employment, Vietnam Work, Vietnam Jobs, Vietnam Job, Job in Vietnam.">
+  <meta name="Keywords" content="employment in vietnam, vietnam employment, vietnam work, vietnam jobs, vietnam job, vietnamwork, vietnam work, vietnamwors, vietnamworks, recruting website">
   <meta property="og:image" content="http://images.vietnamworks.com/img/thumbnail.png"/>
   <meta property="og:title" content="Jobs, find jobs, job search, executive and manager jobs - VietnamWorks"/>
   <meta property="og:url" content="http://www.vietnamworks.com/en/"/>
@@ -26,6 +26,19 @@
   <link rel="stylesheet" type="text/css" href="css/styles.css">
   <!-- /CSS -->
 
+  <!-- Javascript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.6.1/lodash.min.js"></script>
+<script src="http://cdn.jsdelivr.net/jquery/2.1.4/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="http://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.js"></script>
+<script src="http://cdn.jsdelivr.net/algoliasearch.helper/2/algoliasearch.helper.js"></script>
+<script src="http://cdn.jsdelivr.net/hogan.js/3.0.2/hogan.min.common.js"></script>
+<script src="http://cdn.jsdelivr.net/jquery.ion.rangeslider/2.0.12/js/ion.rangeSlider.min.js"></script>
+<script src="conf/config.js"></script>
+<script src="js/moment.js"></script>
+<script src="js/accounting.min.js"></script>
+<script src="js/app.js"></script>
+<!-- /Javascript -->
 </head>
 <body>
 
@@ -94,10 +107,11 @@
     <div class="hit-content jobseeker-item">
       <div class="col-sm-12">
         <h3 class="hit-name">
-          <a target='_blank'  href="http://employer.staging.vietnamworks.com/v2/resume/detail/{{{objectID}}}">{{{fullname}}}</a>
+          <a target='_blank'  onclick="this.href=RESUME_DETAIL_LINK_PREFIX+{{{objectID}}};return true;"
+		  >{{{fullname}}}</a>
         </h3>
         <h4>{{{ _highlightResult.most_recent_position.value }}}</h4>
-        {{#highLight}}...{{{highLight.value}}}...{{/highLight}}
+        <p>{{#highLight}}...{{{highLight.value}}}...{{/highLight}}</p>
       </div>
       <div class="col-sm-6">
         <div class="row">
@@ -240,20 +254,5 @@
     </ul>
   </div>
 </script>
-
-
-
-<!-- Javascript -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.6.1/lodash.min.js"></script>
-<script src="http://cdn.jsdelivr.net/jquery/2.1.4/jquery.min.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-<script src="http://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.js"></script>
-<script src="http://cdn.jsdelivr.net/algoliasearch.helper/2/algoliasearch.helper.js"></script>
-<script src="http://cdn.jsdelivr.net/hogan.js/3.0.2/hogan.min.common.js"></script>
-<script src="http://cdn.jsdelivr.net/jquery.ion.rangeslider/2.0.12/js/ion.rangeSlider.min.js"></script>
-<script src="js/moment.js"></script>
-<script src="js/accounting.min.js"></script>
-<script src="js/app.js"></script>
-<!-- /Javascript -->
 </body>
 </html>

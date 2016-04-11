@@ -1,23 +1,34 @@
-$(document).ready(function () {
+function getUrlVars() {
+  var vars = {};
+  var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+    vars[key] = value;
+  });
+  return vars;
+}
 
+
+var disablePlus = getUrlVars()["disable-plus"] || false;
+console.log(disablePlus);
+
+$(document).ready(function () {
 
 
   // INITIALIZATION
   // ==============
 
-  // Replace with your own values
-  var APPLICATION_ID = 'G9K82IDUDX';
-  var SEARCH_ONLY_API_KEY = '876286a34d35bf9c8b4a8d1398c22a6a';
-  var INDEX_NAME = 'resumes';
   var PARAMS = {
     hitsPerPage: 20,
     maxValuesPerFacet: 5,
     facets: ['type'],
-    disjunctiveFacets: ['category_en', 'location_en', 'job_level_en', 'most_recent_employer', 'suggested_salary', "updated_date", 'exp_years_en', 'attached'],
+    disjunctiveFacets: ['category_en', 'location_en', 'job_level_en', 'most_recent_employer',
+      'suggested_salary', "updated_date",'exp_years_en', 'attached',
+      'nationality_en','language1_name','language1_proficiency_en'],
     // numericFilters: 'updated_date>=1422359939'
   };
   var FACETS_SLIDER = ["suggested_salary", "updated_date"];
-  var FACETS_ORDER_OF_DISPLAY = ['category_en', 'location_en', 'job_level_en', 'most_recent_employer', 'suggested_salary', "updated_date", 'exp_years_en', 'attached'];
+  var FACETS_ORDER_OF_DISPLAY = ['category_en', 'location_en', 'job_level_en', 'most_recent_employer', 'suggested_salary',
+    'updated_date','exp_years_en', 'attached',
+    'nationality_en','language1_name','language1_proficiency_en'];
   var FACETS_LABELS = {
     category_en: 'Category',
     'location_en': 'Location',
@@ -26,7 +37,10 @@ $(document).ready(function () {
     suggested_salary: 'Suggested Salary',
     updated_date: "Last Modified",
     exp_years_en: 'Years of Experience',
-    attached: 'Resume Type'
+    attached: 'Resume Type',
+    nationality_en: 'Nationality',
+    language1_name: 'Language',
+    language1_proficiency_en: 'Language Proficiency'
   };
 
   var sliders = {};
@@ -106,7 +120,7 @@ $(document).ready(function () {
   }
 
   function renderHits(content) {
-    var fields = ["most_recent_position", "exp_jobtitle", "desired_job_title", "resume_title", "content"];
+    var fields = ["most_recent_position", "exp_jobtitle", "desired_job_title"];
     $.each(content.hits, function (i, item) {
       if (!content.hits[i].companyLogo || content.hits[i].companyLogo.length <= 0) {
         content.hits[i].companyLogo = 'http://www.php.company/img/placeholder-logo.png';
@@ -164,7 +178,14 @@ $(document).ready(function () {
           disjunctive: $.inArray(facetName, PARAMS.disjunctiveFacets) !== -1
         };
         facetContent.values.forEach(function (v) {
-          v.countLabel = accounting.formatNumber(v.count);
+          var mod = v.count % 100;
+          var count = v.count - (mod);
+          if (count <= 0) {
+            count = v.count;
+          }
+
+          v.countLabel = disablePlus == "true" ? accounting.formatNumber(v.count) :
+            (accounting.formatNumber(count) + (count >= 100 ? "+" : ""));
         });
         if (facetContent.facet == "attached") {//custom code
           facetContent.values.forEach(function (v) {
@@ -172,7 +193,8 @@ $(document).ready(function () {
             (v.name == "true") && (v.label = "Attached");
           });
         }
-        if (facetContent.facet == "exp_years_en" || facetContent.facet == "job_level_en") {//custom code
+        if (facetContent.facet == "exp_years_en" || facetContent.facet == "job_level_en" ||
+          "language1_proficiency_en") {//custom code
           var weights = {
             "15+ years": 1,
             "10-15 years": 2,
@@ -190,13 +212,20 @@ $(document).ready(function () {
             "Manager": 6,
             "Team Leader/Supervisor": 7,
             "Experienced (Non-Manager)": 8,
-            "New Grad/Entry Level/Internship": 9
+            "New Grad/Entry Level/Internship": 9,
+
+            "Native": 1,
+            "Advanced": 2,
+            "Intermediate": 3,
+            "Beginner": 4,
           };
           facetContent.values.forEach(function (v) {
             v.weight = weights[v.name];
           });
           facetContent.values = facetContent.values.sort(function (a, b) {return a.weight - b.weight;});
         }
+
+        //_.chain(facetContent.values)
         facetsHtml += facetTemplate.render(facetContent);
       }
     }
@@ -366,29 +395,6 @@ $(document).ready(function () {
     $searchInput.val('').focus();
     algoliaHelper.setQuery('').clearRefinements().search();
   });
-  // Added by Ninh
-  // $lastModified.on('change', function (e) {
-  //   console.log('lastModified on change');
-  //   //e.preventDefault();
-  //
-  //   //facetName = 'updated_date';
-  //   lastModifiedSelectVal = parseInt($("#last-modified option:selected").val());
-  //   //alert($lastModifiedSelectVal);
-  //   if (lastModifiedSelectVal > -1) {
-  //     lastModified4Search = ($.now() / 1000) - (lastModifiedSelectVal * 24 * 3600);
-  //     //algoliaHelper.removeNumericFilters('updated_date', '>=');
-  //     algoliaHelper.numericFilters = 'updated_date >= ' + lastModified4Search;
-  //   }
-  //   else {
-  //     //alert('Not search by date'+PARAMS.numericFilters);
-  //     //algoliaHelper.removeNumericRefinement('updated_date', '>=');
-  //     algoliaHelper.numericFilters = '';
-  //   }
-  //   setURLParams();
-  //   algoliaHelper.search();
-  //   console.log('lastModified on change ended');
-  // });
-
 
   // URL MANAGEMENT
   // ==============
@@ -445,7 +451,7 @@ $(document).ready(function () {
 /// TOOLTIP
   function tooltip() {
     $('[data-toggle="tooltip"]').tooltip({html: true});
-  };
+  }
   setTimeout(tooltip, 1000);
 
 });
