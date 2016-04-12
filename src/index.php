@@ -29,14 +29,15 @@ function extractLocation($conn, &$item)
   $sql = "Select cityname, languageid 
         From tblresume_location inner join tblref_city on tblresume_location.cityid = tblref_city.cityid 
         Where resumeid = $resumeid";
-  printSQL($sql);
   $result = $conn->query($sql);
+  $item['location_vi'] = array();
+  $item['location_en'] = array();
   while ($location = $result->fetch_assoc()) {
     if ($location['languageid'] == 1) {
-      $item['location_vi'] = $location['cityname'];
+      array_push($item['location_vi'] , $location['cityname']);
     }
     else {
-      $item['location_en'] = $location['cityname'];
+      array_push($item['location_en'] , $location['cityname']);
     }
   }
   unset($item['location']);
@@ -45,16 +46,21 @@ function extractLocation($conn, &$item)
 function extractIndustry($conn, &$item)
 {
   $categories = explode(',', $item['category']);
+  $item['category_vi'] = array();
+  $item['category_en'] = array();
+//  array_push($batch, $row);
   foreach ($categories as $category) {
     if (!empty($category)) {
       $sql = "Select languageid, industryname From tblref_industry Where industryid = $category";
       $result = $conn->query($sql);
       while ($industry = $result->fetch_assoc()) {
         if ($industry['languageid'] == 1) {
-          $item['category_vi'] = $industry['industryname'];
+          array_push($item['category_vi'], $industry['industryname']);
+//          $item['category_vi'] = $industry['industryname'] + ", ";
         }
         else {
-          $item['category_en'] = $industry['industryname'];
+//          $item['category_en'] = $industry['industryname'];
+          array_push($item['category_en'], $industry['industryname']);
         }
       }
     }
@@ -252,19 +258,16 @@ function extractNationality($conn, &$item)
 //    $totalFailedRecords += ITEMS_PER_BATCH;
     echo 'Caught exception: ', $e->getMessage(), "\n";
   }
-
 }
 
 function extractCredits($conn, &$item)
 {
   $sql = "select * from tblsys_parameter where parcode = 'RS_MULTICREDIT_" . $item["credit_job_level"] . "'";
   $result = $conn->query($sql);
+
+  $item["credits"] = 0;
   if ($row = $result->fetch_assoc()) {
     $item["credits"] = $row["parvalue"];
-  }
-
-  if (!isset($item["credits"])) {
-    $item["credits"] = 0;
   }
 
   $sql = "select * from tblsys_parameter where parcode = 'RS_MULTICREDIT_" . $item["credit_language"] . "'";
@@ -330,7 +333,6 @@ while (true) {
 
       $data[] = $item;
     }
-
 
     $batch = array();
     foreach ($data as $row) {
