@@ -13,17 +13,125 @@ $totalFailedRecords = 0;
 $client = new \AlgoliaSearch\Client(ALGOLIA_APP_ID, ALGOLIA_APP_KEY);
 $index = $client->initIndex(ALGOLIA_INDEX);
 
-if (defined('STDIN') && isset($argc) && $argc > 1) {
-  $secondsAgo = intval($argv[1]);
-}
-else {
-  $secondsAgo = 300;
-}
+//if (defined('STDIN') && isset($argc) && $argc > 1) {
+//  $secondsAgo = intval($argv[1]);
+//}
+//else {
+//  $secondsAgo = 300;
+//}
 
 $buffer_time = 30;
 
 $time_end = date("Y-m-d H:i:00", time() + $buffer_time);
 $time_start = date("Y-m-d H:i:00", time() - ($secondsAgo + $buffer_time));
+
+while (true) {
+  echo "Page $page start " . date("Y/m/d H:i:s") . "\n";
+
+  $offset = ($page - 1) * ITEMS_PER_BATCH;
+  $sql = "Select resumeid, fullname, category, desiredjobtitle as desired_job_title, desiredjoblevelid,
+    education, skill, resumetitle as resume_title, exp_description,
+    edu_major, lastdateupdated as updated_date, joblevel, mostrecentemployer as most_recent_employer,
+    suggestedsalary as suggested_salary, exp_jobtitle, mostrecentposition as most_recent_position,
+    workexperience as work_experience, edu_description,
+    yearsexperienceid, genderid, nationalityid, birthday
+    From tblresume_search_all 
+    ORDER BY resumeid DESC limit $offset, " . ITEMS_PER_BATCH;
+//  $sql = "Select resumeid, fullname, category, desiredjobtitle as desired_job_title, desiredjoblevelid,
+//    education, skill, resumetitle as resume_title, exp_description,
+//    edu_major, lastdateupdated as updated_date, joblevel, mostrecentemployer as most_recent_employer,
+//    suggestedsalary as suggested_salary, exp_jobtitle, mostrecentposition as most_recent_position,
+//    workexperience as work_experience, edu_description,
+//    yearsexperienceid, genderid, nationalityid, birthday
+//    From tblresume_search_all WHERE (lastdateupdated BETWEEN '$time_start' AND '$time_end') ORDER BY resumeid DESC limit $offset, " . ITEMS_PER_BATCH;
+  $conn = new mysqli(SERVER_NAME, USERNAME, PASSWORD, DB_NAME);
+  while ($conn->connect_error) {
+    $conn->close();
+    $conn = new mysqli(SERVER_NAME, USERNAME, PASSWORD, DB_NAME);
+    echo "sql connection error";
+  }
+
+  $result = $conn->query($sql);
+
+  if ($result->num_rows > 0) {
+    $data = [];
+
+    while ($row = $result->fetch_assoc()) {
+      $item = $row;
+      $item["suggested_salary"] = (int)+$item["suggested_salary"];
+      $item["updated_date"] = strtotime($item["updated_date"]);
+      $item["birthday"] = (int)+substr($item["birthday"], 0, 4);
+
+      $item['gender'] = "female";
+      if ($item['genderid'] == 1) {
+        $item['gender'] = "male";
+      }
+      unset($item['genderid']);
+
+      extractLocation($conn, $item);
+
+      extractIndustry($conn, $item);
+
+      extractJobLevel($conn, $item, $item["joblevel"], "job_level");
+
+      extractJobLevel($conn, $item, $item["desiredjoblevelid"], "desired_job_level");
+
+      extractAttached($conn, $item);
+
+      extractTotal($conn, $item);
+
+      extractCompletionRate($conn, $item);
+
+      extractYearExperienceResume($conn, $item);
+
+      extractNationality($conn, $item);
+
+      extractLanguageProficiency($conn, $item);
+
+//      extractCredits($conn, $item);
+
+      $data[] = $item;
+    }
+
+    $batch = array();
+    foreach ($data as $row) {
+      $row['objectID'] = $row['resumeid'];
+      array_push($batch, $row);
+      if (count($batch) == ITEMS_PER_BATCH) {
+        while (count($batch) > 0) {
+          try {
+            $index->saveObjects($batch);
+            $batch = array();
+          } catch (Exception $e) {
+            $totalFailedRecords += 1;
+            echo 'Caught exception: ', $e->getMessage(), "\n";
+            if (isset($e->objectID)) {
+              $conn = new mysqli(SERVER_NAME, USERNAME, PASSWORD, DB_NAME);
+              $batch = array_filter($batch, function ($it) use ($e) {
+                return $it["objectID"] == $e->objectID;
+              });
+            }
+            continue;
+          }
+        }
+      }
+    }
+
+    echo ($page * ITEMS_PER_BATCH - $totalFailedRecords) . " records have been saved" . PHP_EOL;
+  }
+  else {
+    echo "0 results";
+    break;
+  }
+
+  $page++;
+  if ($page > TOTAL_BATCHES) {
+    break;
+  }
+}
+
+$conn->close();
+echo "END " . date("Y/m/d H:i:s") . "\n";
 
 function printSQL($sql)
 {
@@ -198,51 +306,6 @@ function extractLanguageProficiency($conn, &$item)
     extractLangLevel($conn, $item, $row["language1"], $row["languagelevel1"]);
     extractLangLevel($conn, $item, $row["language2"], $row["languagelevel2"]);
     extractLangLevel($conn, $item, $row["language3"], $row["languagelevel3"]);
-//    extractLangLevel($conn, $item, $row["language4"], $row["languagelevel4"]);
-
-//    $item["Lang_proficiency"] = array();
-
-//    if (isset($row["language1"]) && $row["language1"] > 0) {
-//      $langProficiency = new stdClass();
-//      $langProficiency->lang = $row["language1"];
-//      $langProficiency->level = $row["languagelevel1"];
-//      array_push($item["Lang_proficiency"], $langProficiency);
-//    }
-//
-//    $langProficiency = new stdClass();
-//    $langProficiency->lang = $row["language2"];
-//    $langProficiency->level = $row["languagelevel2"];
-//    array_push($item["Lang_proficiency"], $langProficiency);
-//
-//    $langProficiency = new stdClass();
-//    $langProficiency->lang = $row["language3"];
-//    $langProficiency->level = $row["languagelevel3"];
-//    array_push($item["Lang_proficiency"], $langProficiency);
-//
-//    $langProficiency = new stdClass();
-//    $langProficiency->lang = $row["language4"];
-//    $langProficiency->level = $row["languagelevel4"];
-//    array_push($item["Lang_proficiency"], $langProficiency);
-
-//    $item["language1"] = $row["language1"];
-//    $item["language2"] = $row["language2"];
-//    $item["language3"] = $row["language3"];
-//    $item["language4"] = $row["language4"];
-//    $item["languagelevel1"] = $row["languagelevel1"];
-//    $item["languagelevel2"] = $row["languagelevel2"];
-//    $item["languagelevel3"] = $row["languagelevel3"];
-//    $item["languagelevel4"] = $row["languagelevel4"];
-
-    // Language proficiency: flat now and only the 1st(will nested and multi later)
-//    extractLanguage($conn, $item);
-//    extractLanguageProficiency($conn, $item);
-
-//    if (isset($item["language1_name"]) && isset($item["language1_proficiency_en"])) {
-//      $item["credit_language"] = strtoupper($item["language1_name"] . "_" . $item["language1_proficiency_en"]);
-//    }
-//    else {
-//      $item["credit_language"] = "";
-//    }
   }
 
 }
@@ -344,93 +407,3 @@ function extractNationality($conn, &$item)
   }
 }
 
-while (true) {
-  echo "Page $page start " . date("Y/m/d H:i:s") . "\n";
-
-  $offset = ($page - 1) * ITEMS_PER_BATCH;
-  $sql = "Select resumeid, fullname, category, desiredjobtitle as desired_job_title, desiredjoblevelid,
-    education, skill, resumetitle as resume_title, exp_description,
-    edu_major, lastdateupdated as updated_date, joblevel, mostrecentemployer as most_recent_employer,
-    suggestedsalary as suggested_salary, exp_jobtitle, mostrecentposition as most_recent_position,
-    workexperience as work_experience, edu_description,
-    yearsexperienceid, genderid, nationalityid, birthday
-    From tblresume_search_all WHERE (lastdateupdated BETWEEN '$time_start' AND '$time_end') ORDER BY resumeid DESC limit $offset, " . ITEMS_PER_BATCH;
-  $result = $conn->query($sql);
-
-  if ($result->num_rows > 0) {
-    $data = [];
-
-    while ($row = $result->fetch_assoc()) {
-      $item = $row;
-      $item["suggested_salary"] = (int)+$item["suggested_salary"];
-      $item["updated_date"] = strtotime($item["updated_date"]);
-      $item["birthday"] = (int)+substr($item["birthday"], 0, 4);
-
-      $item['gender'] = "female";
-      if ($item['genderid'] == 1) {
-        $item['gender'] = "male";
-      }
-      unset($item['genderid']);
-
-      extractLocation($conn, $item);
-
-      extractIndustry($conn, $item);
-
-      extractJobLevel($conn, $item, $item["joblevel"], "job_level");
-
-      extractJobLevel($conn, $item, $item["desiredjoblevelid"], "desired_job_level");
-
-      extractAttached($conn, $item);
-
-      extractTotal($conn, $item);
-
-      extractCompletionRate($conn, $item);
-
-      extractYearExperienceResume($conn, $item);
-
-      extractNationality($conn, $item);
-
-      extractLanguageProficiency($conn, $item);
-
-//      extractCredits($conn, $item);
-
-      $data[] = $item;
-    }
-
-    $batch = array();
-    foreach ($data as $row) {
-      $row['objectID'] = $row['resumeid'];
-      array_push($batch, $row);
-      if (count($batch) == ITEMS_PER_BATCH) {
-        while (count($batch) > 0) {
-          try {
-            $index->saveObjects($batch);
-            $batch = array();
-          } catch (Exception $e) {
-            $totalFailedRecords += 1;
-            echo 'Caught exception: ', $e->getMessage(), "\n";
-            echo 'try again without: ', $e["objectID"], "\n";
-            $batch = array_filter($batch, function ($it) use ($e) {
-              return $it["objectID"] == $e["objectID"];
-            });
-            continue;
-          }
-        }
-      }
-    }
-
-    echo ($page * ITEMS_PER_BATCH - $totalFailedRecords) . " records have been saved" . PHP_EOL;
-  }
-  else {
-    echo "0 results";
-    break;
-  }
-
-  $page++;
-  if ($page > TOTAL_BATCHES) {
-    break;
-  }
-}
-
-$conn->close();
-echo "END " . date("Y/m/d H:i:s") . "\n";
