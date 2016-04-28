@@ -4,15 +4,15 @@ require __DIR__ . '/../conf/config.php';
 
 if (defined('STDIN') && isset($argc) && $argc > 1) {
   $secondsAgo = intval($argv[1]);
-} else {
-  $secondsAgo = 300;
+}
+else {
+  $secondsAgo = -1;
 }
 
 $buffer_time = 30;
 
 $time_end = date("Y-m-d H:i:00", time() + $buffer_time);
 $time_start = date("Y-m-d H:i:00", time() - ($secondsAgo + $buffer_time));
-
 
 echo "START " . date("Y/m/d H:i:s") . "\n";
 $conn = new mysqli(SERVER_NAME, USERNAME, PASSWORD, DB_NAME);
@@ -41,7 +41,19 @@ while (true) {
   echo "Page $page start " . date("Y/m/d H:i:s") . "\n";
 
   $offset = ($page - 1) * ITEMS_PER_BATCH;
-  $sql = "Select resumeid, fullname, category, desiredjobtitle as desired_job_title, desiredjoblevelid,
+
+  if ($secondsAgo == -1) {
+    $sql = "Select resumeid, fullname, category, desiredjobtitle as desired_job_title, desiredjoblevelid,
+    education, skill, resumetitle as resume_title, exp_description,
+    edu_major, lastdateupdated as updated_date, joblevel, mostrecentemployer as most_recent_employer,
+    suggestedsalary as suggested_salary, exp_jobtitle, mostrecentposition as most_recent_position,
+    workexperience as work_experience, edu_description,
+    yearsexperienceid, genderid, nationalityid, birthday
+    From tblresume_search_all 
+    ORDER BY resumeid DESC limit $offset, " . ITEMS_PER_BATCH;
+  }
+  else {
+    $sql = "Select resumeid, fullname, category, desiredjobtitle as desired_job_title, desiredjoblevelid,
     education, skill, resumetitle as resume_title, exp_description,
     edu_major, lastdateupdated as updated_date, joblevel, mostrecentemployer as most_recent_employer,
     suggestedsalary as suggested_salary, exp_jobtitle, mostrecentposition as most_recent_position,
@@ -50,6 +62,7 @@ while (true) {
     From tblresume_search_all 
     WHERE (lastdateupdated BETWEEN '$time_start' AND '$time_end')
     ORDER BY resumeid DESC limit $offset, " . ITEMS_PER_BATCH;
+  }
 //  $sql = "Select resumeid, fullname, category, desiredjobtitle as desired_job_title, desiredjoblevelid,
 //    education, skill, resumetitle as resume_title, exp_description,
 //    edu_major, lastdateupdated as updated_date, joblevel, mostrecentemployer as most_recent_employer,
