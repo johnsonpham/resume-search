@@ -50,8 +50,6 @@ while (true) {
     From tblresume_search_all 
     WHERE (lastdateupdated BETWEEN '$time_start' AND '$time_end')
     ORDER BY resumeid DESC limit $offset, " . ITEMS_PER_BATCH;
-  var_dump($sql);
-  die;
 //  $sql = "Select resumeid, fullname, category, desiredjobtitle as desired_job_title, desiredjoblevelid,
 //    education, skill, resumetitle as resume_title, exp_description,
 //    edu_major, lastdateupdated as updated_date, joblevel, mostrecentemployer as most_recent_employer,
