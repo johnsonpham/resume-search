@@ -20,15 +20,23 @@ $time_start = date("Y-m-d H:i:00", time() - ($secondsAgo + $buffer_time));
 echo "START " . date("Y/m/d H:i:s")."\n";
 // Create connection
 $conn = new mysqli(SERVER_NAME, USERNAME, PASSWORD, DB_NAME);
+
 // Check connection
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
+}
+
+if (!$conn->set_charset("utf8")) {
+  printf("Faild set charset utf8 : %s\n", $conn->error);
+} else {
+  printf("Success set charset : %s\n", $conn->character_set_name());
 }
 
 $page = 1;
 $totalFailedRecords = 0;
 $client = new \AlgoliaSearch\Client(ALGOLIA_APP_ID, ALGOLIA_APP_KEY);
 $index = $client->initIndex(ALGOLIA_INDEX);
+
 
 function printSQL($sql)
 {
@@ -362,6 +370,9 @@ while (true) {
       $data[] = $item;
     }
 
+//    var_dump($item);
+//    die;
+
 
     $batch = array();
     foreach ($data as $row) {
@@ -386,6 +397,8 @@ while (true) {
     }
 
     echo ($page * ITEMS_PER_BATCH - $totalFailedRecords) . " records have been saved" . PHP_EOL;
+
+    die;
   }
   else {
     echo "0 results";
