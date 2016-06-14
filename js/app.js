@@ -21,13 +21,15 @@ $(document).ready(function () {
     maxValuesPerFacet: 5,
     facets: ['type'],
     disjunctiveFacets: ['category_en', 'location_en', 'job_level_en', 'most_recent_employer',
-      'suggested_salary', "updated_date",'exp_years_en', 'attached',
+      'suggested_salary', "updated_date",
+      'exp_years_en', 'attached',
       'nationality_en','language1_name','language1_proficiency_en'],
     // numericFilters: 'updated_date>=1422359939'
   };
   var FACETS_SLIDER = ["suggested_salary", "updated_date"];
-  var FACETS_ORDER_OF_DISPLAY = ['category_en', 'location_en', 'job_level_en', 'most_recent_employer', 'suggested_salary',
-    'updated_date','exp_years_en', 'attached',
+  var FACETS_ORDER_OF_DISPLAY = ['category_en', 'location_en', 'job_level_en', 'most_recent_employer',
+    'suggested_salary', "updated_date",
+    'exp_years_en', 'attached',
     'nationality_en','language1_name','language1_proficiency_en'];
   var FACETS_LABELS = {
     category_en: 'Category',
@@ -35,7 +37,7 @@ $(document).ready(function () {
     job_level_en: 'Job Level',
     most_recent_employer: 'Most recent employer',
     suggested_salary: 'Suggested Salary',
-    updated_date: "Last Modified",
+    "updated_date": "Last modified",
     exp_years_en: 'Years of Experience',
     attached: 'Resume Type',
     nationality_en: 'Nationality',
@@ -126,7 +128,12 @@ $(document).ready(function () {
         content.hits[i].companyLogo = 'http://www.php.company/img/placeholder-logo.png';
       }
       item.updated_date_label = moment.unix(item.updated_date).format("DD/MM/YYYY");
-      item.suggested_salary_label = accounting.formatNumber(item.suggested_salary);
+      if(item.suggested_salary > 0){
+        item.suggested_salary_label = '$' + accounting.formatNumber(item.suggested_salary);
+      }else{
+        item.suggested_salary_label = 'Negotiable';
+      }
+
       var fi = -1;
       item.highLight = _.chain(item._highlightResult)
         .pickBy(function (o) {return o.matchedWords.length > 0;})
@@ -235,9 +242,9 @@ $(document).ready(function () {
   function bindSearchObjects(state) {
     // Bind Sliders
     for (facetIndex = 0; facetIndex < FACETS_SLIDER.length; ++facetIndex) {
-      var facetName = FACETS_SLIDER[facetIndex];
-      var slider = $('#' + facetName + '-slider');
-      var sliderOptions = {
+      let facetName = FACETS_SLIDER[facetIndex];
+      let slider = $('#' + facetName + '-slider');
+      let sliderOptions = {
         type: 'double',
         grid: true,
         min: slider.data('min'),

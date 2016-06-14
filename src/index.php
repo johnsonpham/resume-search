@@ -2,18 +2,41 @@
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../conf/config.php';
 
+
+if (defined('STDIN') && isset($argc) && $argc > 1) {
+  $secondsAgo = intval($argv[1]);
+}
+else {
+  $secondsAgo = -1;
+}
+
+$buffer_time = 30;
+
+$time_end = date("Y-m-d H:i:00", time() + $buffer_time);
+$time_start = date("Y-m-d H:i:00", time() - ($secondsAgo + $buffer_time));
+
+
+
 echo "START " . date("Y/m/d H:i:s")."\n";
 // Create connection
 $conn = new mysqli(SERVER_NAME, USERNAME, PASSWORD, DB_NAME);
+
 // Check connection
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
+}
+
+if (!$conn->set_charset("utf8")) {
+  printf("Faild set charset utf8 : %s\n", $conn->error);
+} else {
+  printf("Success set charset : %s\n", $conn->character_set_name());
 }
 
 $page = 1;
 $totalFailedRecords = 0;
 $client = new \AlgoliaSearch\Client(ALGOLIA_APP_ID, ALGOLIA_APP_KEY);
 $index = $client->initIndex(ALGOLIA_INDEX);
+
 
 function printSQL($sql)
 {
@@ -281,13 +304,29 @@ while (true) {
 	echo "Page $page start " . date("Y/m/d H:i:s")."\n";
 
   $offset = ($page - 1) * ITEMS_PER_BATCH;
-  $sql = "Select resumeid, fullname, category, desiredjobtitle as desired_job_title, desiredjoblevelid, 
+  if ($secondsAgo == -1) {
+    $sql = "Select resumeid, fullname, category, desiredjobtitle as desired_job_title, desiredjoblevelid, 
     education, skill, resumetitle as resume_title, exp_description, 
     edu_major, lastdateupdated as updated_date, joblevel, mostrecentemployer as most_recent_employer, 
     suggestedsalary as suggested_salary, exp_jobtitle, mostrecentposition as most_recent_position, 
     workexperience as work_experience, edu_description,
     yearsexperienceid, genderid, nationalityid, birthday
     From tblresume_search_all ORDER BY resumeid DESC limit $offset, " . ITEMS_PER_BATCH;
+
+  }
+  else {
+    $sql = "Select resumeid, fullname, category, desiredjobtitle as desired_job_title, desiredjoblevelid, 
+    education, skill, resumetitle as resume_title, exp_description, 
+    edu_major, lastdateupdated as updated_date, joblevel, mostrecentemployer as most_recent_employer, 
+    suggestedsalary as suggested_salary, exp_jobtitle, mostrecentposition as most_recent_position, 
+    workexperience as work_experience, edu_description,
+    yearsexperienceid, genderid, nationalityid, birthday
+    From tblresume_search_all
+     WHERE (updated_date BETWEEN '$time_start' AND '$time_end')
+    ORDER BY resumeid DESC limit $offset, " . ITEMS_PER_BATCH;
+
+  }
+
   printSQL($sql);
   $result = $conn->query($sql);
 
@@ -331,6 +370,9 @@ while (true) {
       $data[] = $item;
     }
 
+//    var_dump($item);
+//    die;
+
 
     $batch = array();
     foreach ($data as $row) {
@@ -355,6 +397,8 @@ while (true) {
     }
 
     echo ($page * ITEMS_PER_BATCH - $totalFailedRecords) . " records have been saved" . PHP_EOL;
+
+    die;
   }
   else {
     echo "0 results";
